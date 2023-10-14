@@ -36,7 +36,12 @@ def new_video():
 
     user = users.find_one({"_id": int(data['user_id'])})
     if not user:
-        return jsonify({"message": "User not found"}), 404    
+        return jsonify({"message": "User not found"}), 404 
+    if user['creditsUsed'] >= user['maxCredits']:
+        return jsonify({"message": "out of credits"}, 400)
+    user['creditsUsed'] += 1
+    
+    users.update_one({"_id": int(data['user_id'])}, {"$inc": {"creditsUsed": 1}})
     
     conversations = user.get("conversations", [])
     v_desc = get_video_description(data['video_id'])
@@ -293,9 +298,12 @@ def login():
 def pay():
     db = client["test"]
     collection = db["users"]
-    # 
     data = request.get_json()
+    
+    user = collection.find_one({"_id": int(data['user_id'])})
+    print(user)
 
+    return jsonify({"message": "successfull payment"}, 200)
 
 if __name__ == '__main__':
     app.run(debug=True)
