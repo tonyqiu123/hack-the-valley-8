@@ -51,6 +51,8 @@ def video_data():
     if result.inserted_id:
         return jsonify(video)
 
+
+
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])
 def connect():
@@ -61,6 +63,23 @@ def connect():
     result = list(collection.find({}))      
     # return list of curr data, TESTING PURPOSES
     return jsonify(result)
+
+
+
+@app.route('/userinfo', methods=['GET'])
+def userinfo():
+    ...
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
+    user_id = int(request.args.get("user_id"))
+    user = collection.find_one({"_id": user_id})
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    
+    return jsonify({"user":user})
+
+
 
 @app.route('/video-conversation-history', methods=['GET'])
 def video_conversation_history():
@@ -82,6 +101,8 @@ def video_conversation_history():
 
     return jsonify({"message": "Conversation ID not found for the user"}), 404
 
+
+
 @app.route('/user-conversation-history', methods=['GET'])
 def user_conversation_history():
     ...
@@ -100,6 +121,8 @@ def user_conversation_history():
         # print(conversation)
         conversation_list.append({"_id":conversation["_id"], "lead_message":conversation["messages"][0]['message']})
     return jsonify({"user-history":conversation_list})
+
+
 
 @app.route('/send-message', methods=['POST'])
 def send_message():
@@ -142,12 +165,35 @@ def send_message():
             conversation["messages"].append(bot_doc)
             break
 
-            
-    # Update the user's document in the MongoDB collection
+    else:
+        current_time = str(datetime.now())
+        re_time = time_format(current_time)
+        new_conversation = {
+            "_id": data['conversation_id'],
+            "videoId": "fdslkjfdsfdsj",
+            "messages": [
+                {
+                    "_id": str(uuid4()),
+                    "speaker": "user",
+                    "message": data['message'],
+                    "createdAt": re_time
+                },
+                {
+                    "_id": str(uuid4()),
+                    "speaker": "bot",
+                    "message": generate_response(data['message']),
+                    "createdAt": re_time
+                }
+            ]
+        }
+        conversations.append(new_conversation)
+
     collection.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
 
     return jsonify({"message": "Message added to the conversation"})
-        
+
+
+
 @app.route("/clear", methods=["POST"])
 def clear():
     # Connect to the database
