@@ -57,14 +57,15 @@ def new_video():
     new_conversation = {
             "_id": str(uuid4()),
             "videoId": videos.find_one(sort=[("createdAt", -1)]).get("videoId"),
-            "messages": []
+            "messages": [],
+            "summary": v_summ
         }
     conversations.append(new_conversation)
 
     users.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
 
     if result.inserted_id:
-        return jsonify({"conversation_id": new_conversation["_id"]})
+        return jsonify({"conversation_id": new_conversation["_id"], "summary":v_summ})
 
 
 
