@@ -6,8 +6,11 @@ import DeleteIcon from '../assets/delete.svg'
 import LogoutIcon from '../assets/logout.svg'
 import ProfileIcon from '../assets/profile.svg'
 import PlusIcon from '../assets/plus.svg'
+import { useNavigate } from "react-router-dom"
 
 const ConversationHistory = () => {
+
+    const navigate = useNavigate()
 
     const [ConversationHistoryData, setConversationHistoryData] = useState(null)
 
@@ -21,6 +24,12 @@ const ConversationHistory = () => {
                 console.error('Error fetching data: ', error)
             })
     }
+
+    const handleLogout = () => {
+        localStorage.removeItem('userId')
+        navigate('/login')
+    }
+
     useEffect(() => {
         fetchConversationHistoryData()
     }, [ConversationHistoryData])
@@ -51,7 +60,7 @@ const ConversationHistory = () => {
                             <img src={DeleteIcon} />
                             <p>Clear conversation history</p>
                         </div>
-                        <div className="popoverMenuItem">
+                        <div onClick={(e) => handleLogout()} className="popoverMenuItem">
                             <img src={LogoutIcon} />
                             <p>Log out</p>
                         </div>
