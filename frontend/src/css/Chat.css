@@ -159,6 +159,13 @@
     gap: 12px;
 }
 
+.chatFinished-right-messageBody {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+}
+
 .chatFinished-right-message {
     display: flex;
     gap: 8px;
