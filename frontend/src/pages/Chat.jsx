@@ -42,7 +42,9 @@ const Chat = () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            setUserData(prev => ({ ...prev,  }))
+            const data = await response.json()
+            const userConversations = userData.conversations
+            setUserData(prev => ({ ...prev, conversations: [userConversations, { _id: data.conversation_id, videoId: urlInput, messages: [] }] }))
             setPhase('finishedFetching');
         } catch (err) {
             console.error('Error:', err);

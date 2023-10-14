@@ -8,10 +8,15 @@ import PlusIcon from '../assets/plus.svg'
 import ProgressBar from "@ramonak/react-progress-bar";
 import { useNavigate } from "react-router-dom"
 import '../css/ProgressBar.css'
+import { useEffect } from 'react'
 
 const ConversationHistory = ({ setPhase, userData, setUserData }) => {
 
     const navigate = useNavigate()
+
+    useEffect(() => {
+        console.log(userData)
+    }, [userData])
 
     const handleLogout = () => {
         localStorage.removeItem('userId')
@@ -47,7 +52,7 @@ const ConversationHistory = ({ setPhase, userData, setUserData }) => {
                     userData.conversations.map((conversationData, index) => (
                         <div className="conversationItem" key={index}>
                             <p className="conversationText">
-                                {conversationData.messages[0].message}
+                                {/* {conversationData.messages[0].message} */}
                             </p>
                         </div>
                     ))
