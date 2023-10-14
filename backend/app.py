@@ -49,7 +49,7 @@ def video_data():
     video = {"_id":new_id, "transcript": transcript, "summarization": v_summ, "createdAt": re_time}
     result = collection.insert_one(video)
     if result.inserted_id:
-        return jsonify({"message": "Video documents created successfully", "inserted_id": str(result.inserted_id)})
+        return jsonify(video)
 
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])
@@ -57,142 +57,152 @@ def connect():
     ...
     client = mongod_connect()
     db = client["test"]
-    collection = db["conversations"]
+    collection = db["users"]
     result = list(collection.find({}))      
     # return list of curr data, TESTING PURPOSES
     return jsonify(result)
 
-@app.route('/get-chat-history', methods=['GET'])
-def chat_history():
-    # get the createdAt timestamp
-    # body is userId and videoId
-    userId = request.args.get("userId")
-    videoId = request.args.get("videoId")
+@app.route('/video-conversation-history', methods=['GET'])
+def video_conversation_history():
+    # get messages for a specific conversation id
+    user_id = int(request.args.get("user_id"))
+    target_conversation_id = request.args.get("target_conversation_id")
 
     client = mongod_connect()
     db = client["test"]
-    collection = db["conversations"]
+    collection = db["users"]
+    user = collection.find_one({"_id": user_id})
+    if not user:
+        return jsonify({"message": "User not found"}), 404    
     
-    documents = list(collection.find({"userId": int(userId), "videoId": videoId}))
-    if documents:
-        return jsonify({"documents": documents})
-    else:
-        return jsonify({"message": "Document not found for the provided userId and videoId"}, 404)
+    for conversation in user.get("conversations", []):
+        if conversation.get("_id") == target_conversation_id:
+            # print((conversation['messages']))
+            return jsonify({"video-history": conversation['messages']}), 200
+
+    return jsonify({"message": "Conversation ID not found for the user"}), 404
+
+@app.route('/user-conversation-history', methods=['GET'])
+def user_conversation_history():
+    ...
+    # get all conversation key value pairs
+    user_id = int(request.args.get("user_id"))
+
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
+    user = collection.find_one({"_id": user_id})
+    if not user:
+        return jsonify({"message": "User not found"}), 404 
+
+    conversation_list = []
+    for conversation in user.get("conversations", []):
+        # print(conversation)
+        conversation_list.append({"_id":conversation["_id"], "lead_message":conversation["messages"][0]['message']})
+    return jsonify({"user-history":conversation_list})
 
 @app.route('/send-message', methods=['POST'])
 def send_message():
     ...
-    # connect to db
-    client = mongod_connect()
-    db = client["test"]
-    collection = db["conversations"]
-
-    data = request.get_json()
-
-    # use regex to format curr time
-    current_time = str(datetime.now())
-    re_time = time_format(current_time)
-
-    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
-    if new_id is not None:
-        new_id = new_id["_id"] + 1  # Increment the latest _id
-    else:
-        new_id = 1  # First entry
-
-    user_doc = {
-        "_id": new_id,
-        "userId": data['userId'],
-        "videoId": data['videoId'],
-        "entry": data['entry'],
-        "speaker": "user",
-        "createdAt": re_time
-    }
-    
-    # Insert the new entry into the MongoDB collection
-    result = collection.insert_one(user_doc)
-    
-    if result.inserted_id:
-        bot_response = generate_response(data['entry'])
-
-        # use regex to format cur time
-        current_time = str(datetime.now())
-        re_time = time_format(current_time)
-
-        new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
-        if new_id is not None:
-            new_id = new_id["_id"] + 1  # Increment the latest _id
-        else:
-            new_id = 1  # First entry
-
-        bot_doc = {
-            "_id": new_id,
-            "userId": data['userId'],
-            "videoId": data['videoId'],
-            "entry": bot_response,
-            "speaker": "bot",
-            "createdAt": re_time
-        }
-        result = collection.insert_one(bot_doc)
-    
-        if result.inserted_id:
-            return jsonify({"message": "Conversation documents created successfully", "inserted_id": str(result.inserted_id)})
-    else:
-        return jsonify({"message": "Document creation failed"}, 500)
-
-
-"""sign in and user validation"""
-@app.route("/signup", methods=["POST"])
-def signup():
-    ...
-    # connect to db
     client = mongod_connect()
     db = client["test"]
     collection = db["users"]
 
-    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
-    if new_id is not None:
-        new_id = new_id["_id"] + 1  # Increment the latest _id
-    else:
-        new_id = 1  # First entry
-    
+    # need users_id, conversations_id
     data = request.get_json()
 
-    # TODO check database for existing users
-    existing_user = collection.find_one({"email": data['email']})
-
-    if existing_user:
-        return jsonify({"error": "Email already exists"}), 400
-    
-    user = {
-        "_id" : new_id,
-        "userToken" : str(uuid4()),
-        "email" : data['email'],
-        "password" : data['password'],
-        "name" : data['name']
-    }
-    
-    # Insert the new entry into the MongoDB collection
-    result = collection.insert_one(user)
-    
-    if result.inserted_id:
-        return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
-    else:
-        return jsonify({"message": "Entry creation failed"}, 500)
-
-@app.route("/login", methods=["POST"])
-def login():
-    ...
     client = mongod_connect()
     db = client["test"]
     collection = db["users"]
+    user = collection.find_one({"_id": int(data['user_id'])})
+    if not user:
+        return jsonify({"message": "User not found"}), 404    
+    
+    conversations = user.get("conversations", [])
 
-    data = request.get_json()
-    existing_user = collection.find_one({"email": data['email']})
-    if not existing_user:
-        return jsonify({"error": "Email not found"}), 400
-    if existing_user["password"] != data['password']:
-        return jsonify({"error": "Incorrect Email and Password combination"}), 400
-    return jsonify({"userToken" : existing_user["userToken"]})
+    for conversation in conversations:
+        if conversation.get("_id") == data['conversation_id']:
+            current_time = str(datetime.now())
+            re_time = time_format(current_time)
+
+            user_doc = {
+                "_id": str(uuid4()),
+                "createdAt": re_time,
+                "message": data['message'],
+                "speaker": "user"
+            }
+            conversation["messages"].append(user_doc)
+            
+            bot_doc = {
+                "_id": str(uuid4()),
+                "createdAt": re_time,
+                "message": generate_response(data['message']),
+                "speaker": "bot"
+            }
+            conversation["messages"].append(bot_doc)
+            break
+
+            
+    # Update the user's document in the MongoDB collection
+    collection.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
+
+    return jsonify({"message": "Message added to the conversation"})
+    
+
+
+# """sign in and user validation"""
+# @app.route("/signup", methods=["POST"])
+# def signup():
+#     ...
+#     # connect to db
+#     client = mongod_connect()
+#     db = client["test"]
+#     collection = db["users"]
+
+#     new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+#     if new_id is not None:
+#         new_id = new_id["_id"] + 1  # Increment the latest _id
+#     else:
+#         new_id = 1  # First entry
+    
+#     data = request.get_json()
+
+#     # check database for existing users
+#     existing_user = collection.find_one({"email": data['email']})
+
+#     if existing_user:
+#         return jsonify({"error": "Email already exists"}), 400
+    
+#     user = {
+#         "_id" : new_id,
+#         "userToken" : str(uuid4()),
+#         "email" : data['email'],
+#         "password" : data['password'],
+#         "name" : data['name']
+#     }
+    
+#     # Insert the new entry into the MongoDB collection
+#     result = collection.insert_one(user)
+    
+#     if result.inserted_id:
+#         return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
+#     else:
+#         return jsonify({"message": "Entry creation failed"}, 500)
+
+# @app.route("/login", methods=["POST"])
+# def login():
+#     ...
+#     client = mongod_connect()
+#     db = client["test"]
+#     collection = db["users"]
+
+#     data = request.get_json()
+#     existing_user = collection.find_one({"email": data['email']})
+#     if not existing_user:
+#         return jsonify({"error": "Email not found"}), 400
+#     if existing_user["password"] != data['password']:
+#         return jsonify({"error": "Incorrect Email and Password combination"}), 400
+#     return jsonify({"userToken" : existing_user["userToken"]})
 
 
 if __name__ == '__main__':
