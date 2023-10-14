@@ -1,0 +1,162 @@
+[
+    {
+        "_id": 1,
+        "userId": 101,
+        "videoId": "https://www.youtube.com/watch?v=video1",
+        "entry": "What is the weather like today?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T08:00:00"
+    },
+    {
+        "_id": 2,
+        "userId": 101,
+        "videoId": "https://www.youtube.com/watch?v=video1",
+        "entry": "It's partly cloudy with a chance of rain.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T08:05:00"
+    },
+    {
+        "_id": 3,
+        "userId": 102,
+        "videoId": "https://www.youtube.com/watch?v=video2",
+        "entry": "How do I cook a perfect omelette?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T08:10:00"
+    },
+    {
+        "_id": 4,
+        "userId": 102,
+        "videoId": "https://www.youtube.com/watch?v=video2",
+        "entry": "Beat eggs, add fillings, and cook in a pan.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T08:15:00"
+    },
+    {
+        "_id": 5,
+        "userId": 103,
+        "videoId": "https://www.youtube.com/watch?v=video3",
+        "entry": "Tell me about the history of Rome.",
+        "speaker": "user",
+        "createdAt": "2023-10-13T08:20:00"
+    },
+    {
+        "_id": 6,
+        "userId": 103,
+        "videoId": "https://www.youtube.com/watch?v=video3",
+        "entry": "Rome was founded in 753 BC and became a powerful empire.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T08:25:00"
+    },
+    {
+        "_id": 7,
+        "userId": 104,
+        "videoId": "https://www.youtube.com/watch?v=video4",
+        "entry": "What's the latest tech news?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T08:30:00"
+    },
+    {
+        "_id": 8,
+        "userId": 104,
+        "videoId": "https://www.youtube.com/watch?v=video4",
+        "entry": "The latest tech news includes new iPhone releases.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T08:35:00"
+    },
+    {
+        "_id": 9,
+        "userId": 105,
+        "videoId": "https://www.youtube.com/watch?v=video5",
+        "entry": "How do I improve my coding skills?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T08:40:00"
+    },
+    {
+        "_id": 10,
+        "userId": 105,
+        "videoId": "https://www.youtube.com/watch?v=video5",
+        "entry": "Practice regularly and work on coding projects.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T08:45:00"
+    },
+    {
+        "_id": 11,
+        "userId": 106,
+        "videoId": "https://www.youtube.com/watch?v=video6",
+        "entry": "What's your favorite book?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T08:50:00"
+    },
+    {
+        "_id": 12,
+        "userId": 106,
+        "videoId": "https://www.youtube.com/watch?v=video6",
+        "entry": "I'm just a computer program, so I don't have a favorite book.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T08:55:00"
+    },
+    {
+        "_id": 13,
+        "userId": 107,
+        "videoId": "https://www.youtube.com/watch?v=video7",
+        "entry": "Recommend a good movie to watch.",
+        "speaker": "user",
+        "createdAt": "2023-10-13T09:00:00"
+    },
+    {
+        "_id": 14,
+        "userId": 107,
+        "videoId": "https://www.youtube.com/watch?v=video7",
+        "entry": "I recommend watching 'The Shawshank Redemption'.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T09:05:00"
+    },
+    {
+        "_id": 15,
+        "userId": 108,
+        "videoId": "https://www.youtube.com/watch?v=video8",
+        "entry": "How can I learn a new language quickly?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T09:10:00"
+    },
+    {
+        "_id": 16,
+        "userId": 108,
+        "videoId": "https://www.youtube.com/watch?v=video8",
+        "entry": "Immerse yourself in the language, practice daily.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T09:15:00"
+    },
+    {
+        "_id": 17,
+        "userId": 109,
+        "videoId": "https://www.youtube.com/watch?v=video9",
+        "entry": "What's the best way to stay fit?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T09:20:00"
+    },
+    {
+        "_id": 18,
+        "userId": 109,
+        "videoId": "https://www.youtube.com/watch?v=video9",
+        "entry": "Regular exercise and a balanced diet are key.",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T09:25:00"
+    },
+    {
+        "_id": 19,
+        "userId": 110,
+        "videoId": "https://www.youtube.com/watch?v=video10",
+        "entry": "Can you tell me a joke?",
+        "speaker": "user",
+        "createdAt": "2023-10-13T09:30:00"
+    },
+    {
+        "_id": 20,
+        "userId": 110,
+        "videoId": "https://www.youtube.com/watch?v=video10",
+        "entry": "Why did the computer keep freezing? It left its Windows open!",
+        "speaker": "bot",
+        "createdAt": "2023-10-13T09:35:00"
+    }
+]
