@@ -147,8 +147,28 @@ def send_message():
     collection.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
 
     return jsonify({"message": "Message added to the conversation"})
-    
+        
+@app.route("/clear", methods=["POST"])
+def clear():
+    # Connect to the database
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
 
+    data = request.get_json()
+    user_id = int(data.get("user_id"))
+
+    user = collection.find_one({"_id": user_id})
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    result = collection.update_one({"_id": user_id}, {"$set": {"conversations": []}})
+
+    if result.modified_count > 0:
+        return jsonify({"message": "Conversations cleared"})
+    else:
+        return jsonify({"message": "No conversations to clear"})
 
 # """sign in and user validation"""
 # @app.route("/signup", methods=["POST"])
