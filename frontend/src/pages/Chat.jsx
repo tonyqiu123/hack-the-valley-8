@@ -7,6 +7,7 @@ import ChatEnterUrl from "../components/ChatEnterUrl"
 import ChatFetchState from "../components/ChatFetchState"
 import ChatFinishedFetching from "../components/ChatFinishedFetching"
 import Unauthorized from './Unauthorized'
+import Loading from './Loading'
 
 const Chat = () => {
 
@@ -15,11 +16,13 @@ const Chat = () => {
     const [phase, setPhase] = useState('enterUrl');
     const [userData, setUserData] = useState(null)
     const [userId, setUserId] = useState(localStorage.getItem('userId'))
+    const [loading, setLoading] = useState(true)
+    const [selectedConversation, setSelectedConversation] = useState(null)
 
     const handleFetchUserData = () => {
-        fetch('../../mockUserData.json')
+        fetch('http://localhost:5000/userinfo?user_id=1')
             .then(response => response.json())
-            .then(data => setUserData(data))
+            .then(data => setUserData(data.user))
             .catch(err => {
                 console.error('Failed to fetch video chat history: ', err)
             })
@@ -31,6 +34,7 @@ const Chat = () => {
 
     return (
         <>
+            {loading ? <Loading className={`loading ${userData ? 'inactive' : ''}`} /> : <Unauthorized />}
             {userId && userData ?
                 <div className="chatPage">
                     <ConversationHistory userData={userData} setPhase={setPhase} />
@@ -53,7 +57,7 @@ const Chat = () => {
                             : null}
                     </div>
                 </div>
-                : <Unauthorized />}
+                : null}
         </>
     )
 }

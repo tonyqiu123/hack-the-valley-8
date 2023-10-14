@@ -4,7 +4,8 @@
   "email": "example1@email.com",
   "password": "dsadahdsadad",
   "name": "Dan Li",
-  "maxCredits": "5",
+  "maxCredits": 5,
+  "creditsUsed": 3,
   "conversations": [
     {
       "_id": "dslfdslkfjkfdsfds",

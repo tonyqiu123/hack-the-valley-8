@@ -35,13 +35,18 @@ const ConversationHistory = ({ setPhase, userData }) => {
             </div>
 
             <div className="bottomContainer">
-                <ProgressBar completed={80} />
+                <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
+                <ProgressBar bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />
                 <Popover position="up-right">
                     <div className="popoverItem">
                         <img style={{ height: '24px', width: '24px' }} src={ProfileIcon} />
                         <p>{userData.name}</p>
                     </div>
                     <div className="popoverMenu">
+                        <div className="popoverMenuItem">
+                            <img src={DeleteIcon} />
+                            <p>Buy more credits</p>
+                        </div>
                         <div className="popoverMenuItem">
                             <img src={DeleteIcon} />
                             <p>Clear conversation history</p>
