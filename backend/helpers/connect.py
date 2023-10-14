@@ -12,6 +12,3 @@ def mongod_connect():
     except Exception as e:
         print(e)
         raise e
-
-# test
-# connect()        

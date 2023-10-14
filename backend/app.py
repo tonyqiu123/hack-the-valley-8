@@ -8,18 +8,18 @@ import re
 app = Flask(__name__)
 CORS(app)
 
-"""root route"""
-@app.route('/')
-def index():
-    test_message = {"message":"root route reached"}
-    return jsonify(test_message)
+# """root route"""
+# @app.route('/')
+# def index():
+#     test_message = {"message":"root route reached"}
+#     return jsonify(test_message)
 
-"""chat route"""
-@app.route('/chat', methods=['POST'])
-def chat():
-    data = request.get_json()
-    bot_response = generate_response(data['prompt'])
-    return jsonify({"response": bot_response})
+# """chat route"""
+# @app.route('/chat', methods=['POST'])
+# def chat():
+#     data = request.get_json()
+#     bot_response = generate_response(data['prompt'])
+#     return jsonify({"response": bot_response})
 
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])
@@ -27,14 +27,14 @@ def connect():
     ...
     client = mongod_connect()
     db = client["test"]
-    collection = db["users"]
+    collection = db["conversations"]
     result = list(collection.find({}))      
     # return list of curr data, TESTING PURPOSES
     return jsonify(result)
 
 @app.route('/get-chat-history', methods=['GET'])
 def chat_history():
-    # get the createdAt
+    # get the createdAt timestamp
     # body is userId and videoId
     userId = request.args.get("userId")
     videoId = request.args.get("videoId")
@@ -59,7 +59,7 @@ def send_message():
 
     data = request.get_json()
 
-    # use regex to format cur time
+    # use regex to format curr time
     current_time = str(datetime.now())
     re_time = re.sub(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d{6}', r'\1T\2', current_time)
 
@@ -69,22 +69,45 @@ def send_message():
     else:
         new_id = 1  # First entry
 
-    new_entry = {
+    user_doc = {
         "_id": new_id,
         "userId": data['userId'],
         "videoId": data['videoId'],
         "entry": data['entry'],
-        "speaker": data['speaker'],
+        "speaker": "user",
         "createdAt": re_time
     }
     
     # Insert the new entry into the MongoDB collection
-    result = collection.insert_one(new_entry)
+    result = collection.insert_one(user_doc)
     
     if result.inserted_id:
-        return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
+        bot_response = generate_response(data['entry'])
+
+        # use regex to format cur time
+        current_time = str(datetime.now())
+        re_time = re.sub(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d{6}', r'\1T\2', current_time)
+
+        new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+        if new_id is not None:
+            new_id = new_id["_id"] + 1  # Increment the latest _id
+        else:
+            new_id = 1  # First entry
+
+        bot_doc = {
+            "_id": new_id,
+            "userId": data['userId'],
+            "videoId": data['videoId'],
+            "entry": bot_response,
+            "speaker": "bot",
+            "createdAt": re_time
+        }
+        result = collection.insert_one(bot_doc)
+    
+        if result.inserted_id:
+            return jsonify({"message": "Conversation documents created successfully", "inserted_id": str(result.inserted_id)})
     else:
-        return jsonify({"message": "Entry creation failed"}, 500)
+        return jsonify({"message": "Document creation failed"}, 500)
 
 
 """sign in and user validation"""
@@ -128,7 +151,7 @@ def signup():
 @app.route("/login", methods=["POST"])
 def login():
     ...
-    
+
 
 
 if __name__ == '__main__':
