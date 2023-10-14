@@ -1,0 +1,28 @@
+.divider-hitbox {
+  cursor: col-resize;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.divider {
+  height: 100%;
+  width: 14px;
+  background-color: rgb(245, 245, 245);
+  display: flex;
+  justify-content: center;
+}
+.divider:hover {
+  background-color: rgb(238, 238, 238);
+}
+
+.rightPane {
+  flex: 1;
+}
+
+.splitView {
+  height: 100dvh;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
