@@ -13,27 +13,27 @@ const Chat = () => {
     const [urlInput, setUrlInput] = useState('')
     const [messageInput, setMessageInput] = useState('')
     const [phase, setPhase] = useState('enterUrl');
-    const [chatVideoHistory, setVideoChatHistory] = useState(null)
+    const [userData, setUserData] = useState(null)
     const [userId, setUserId] = useState(localStorage.getItem('userId'))
 
-    const handleFetchChatVideoHistory = () => {
-        fetch('../../mockChatHistory.json')
+    const handleFetchUserData = () => {
+        fetch('../../mockUserData.json')
             .then(response => response.json())
-            .then(data => setVideoChatHistory(data.documents))
+            .then(data => setUserData(data))
             .catch(err => {
                 console.error('Failed to fetch video chat history: ', err)
             })
     }
 
     useEffect(() => {
-        handleFetchChatVideoHistory()
+        handleFetchUserData()
     }, [])
 
     return (
         <>
-            {userId ?
+            {userId && userData ?
                 <div className="chatPage">
-                    <ConversationHistory />
+                    <ConversationHistory userData={userData} setPhase={setPhase} />
                     <div style={{ paddingLeft: '300px' }}>
 
                         {phase === 'enterUrl' ?
@@ -46,7 +46,7 @@ const Chat = () => {
                         <ChatFetchState phase={phase} setPhase={setPhase} />
 
                         {phase === 'finishedFetching' ?
-                            <ChatFinishedFetching chatVideoHistory={chatVideoHistory}>
+                            <ChatFinishedFetching conversationData={userData.conversations[0]}>
                                 <Input style={{ width: '100%' }} placeHolder="Send a message" search={messageInput} setSearch={setMessageInput} />
                                 <Button size='l' text='Send Message' variant='primary' />
                             </ChatFinishedFetching>
