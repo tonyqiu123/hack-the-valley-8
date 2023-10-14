@@ -23,7 +23,7 @@ CORS(app)
 #     bot_response = generate_response(data['prompt'])
 #     return jsonify({"response": bot_response})
 
-"""get video data route"""
+"""TODO video data route, add video data"""
 @app.route('/video-data', methods=['POST'])
 def video_data():
     ...
@@ -46,14 +46,14 @@ def video_data():
     else:
         new_id = 1  # First entry
 
-    video = {"_id":new_id, "transcript": transcript, "summarization": v_summ, "createdAt": re_time}
+    video = {"_id":new_id, "videoId": data['video_id'], "transcript": transcript, "summarization": v_summ, "createdAt": re_time}
     result = collection.insert_one(video)
     if result.inserted_id:
         return jsonify(video)
 
 
 
-"""connect to DB and CRUD routes"""
+"""TESTING PURPOSES"""
 @app.route('/connect', methods=['GET'])
 def connect():
     ...
@@ -99,10 +99,12 @@ def video_conversation_history():
             # print((conversation['messages']))
             return jsonify({"video-history": conversation['messages']}), 200
 
-    return jsonify({"message": "Conversation ID not found for the user"}), 404
+    # no conversation ID meaning empty list of conversation
+    return jsonify({"message": "No chat history."})
 
 
 
+"""TODO"""
 @app.route('/user-conversation-history', methods=['GET'])
 def user_conversation_history():
     ...
@@ -130,6 +132,7 @@ def send_message():
     client = mongod_connect()
     db = client["test"]
     collection = db["users"]
+    videos = db["videos"]
 
     # need users_id, conversations_id
     data = request.get_json()
@@ -170,7 +173,7 @@ def send_message():
         re_time = time_format(current_time)
         new_conversation = {
             "_id": data['conversation_id'],
-            "videoId": "fdslkjfdsfdsj",
+            "videoId": videos.find_one(sort=[("createdAt", -1)]).get("videoId"),
             "messages": [
                 {
                     "_id": str(uuid4()),
@@ -216,59 +219,65 @@ def clear():
     else:
         return jsonify({"message": "No conversations to clear"})
 
-# """sign in and user validation"""
-# @app.route("/signup", methods=["POST"])
-# def signup():
-#     ...
-#     # connect to db
-#     client = mongod_connect()
-#     db = client["test"]
-#     collection = db["users"]
 
-#     new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
-#     if new_id is not None:
-#         new_id = new_id["_id"] + 1  # Increment the latest _id
-#     else:
-#         new_id = 1  # First entry
+
+"""sign in and user validation"""
+@app.route("/signup", methods=["POST"])
+def signup():
+    ...
+    # connect to db
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
+
+    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+    if new_id is not None:
+        new_id = new_id["_id"] + 1  # Increment the latest _id
+    else:
+        new_id = 1  # First entry
     
-#     data = request.get_json()
+    data = request.get_json()
 
-#     # check database for existing users
-#     existing_user = collection.find_one({"email": data['email']})
+    # check database for existing users
+    existing_user = collection.find_one({"email": data['email']})
 
-#     if existing_user:
-#         return jsonify({"error": "Email already exists"}), 400
+    if existing_user:
+        return jsonify({"error": "Email already exists"}), 400
     
-#     user = {
-#         "_id" : new_id,
-#         "userToken" : str(uuid4()),
-#         "email" : data['email'],
-#         "password" : data['password'],
-#         "name" : data['name']
-#     }
+    user = {
+        "_id" : new_id,
+        "conversations": [],
+        "email" : data['email'],
+        "password" : data['password'],
+        "name" : data['name'],
+        "userToken" : str(uuid4())
+    }
     
-#     # Insert the new entry into the MongoDB collection
-#     result = collection.insert_one(user)
+    # Insert the new entry into the MongoDB collection
+    result = collection.insert_one(user)
     
-#     if result.inserted_id:
-#         return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
-#     else:
-#         return jsonify({"message": "Entry creation failed"}, 500)
+    if result.inserted_id:
+        return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
+    else:
+        return jsonify({"message": "Entry creation failed"}, 500)
 
-# @app.route("/login", methods=["POST"])
-# def login():
-#     ...
-#     client = mongod_connect()
-#     db = client["test"]
-#     collection = db["users"]
 
-#     data = request.get_json()
-#     existing_user = collection.find_one({"email": data['email']})
-#     if not existing_user:
-#         return jsonify({"error": "Email not found"}), 400
-#     if existing_user["password"] != data['password']:
-#         return jsonify({"error": "Incorrect Email and Password combination"}), 400
-#     return jsonify({"userToken" : existing_user["userToken"]})
+
+@app.route("/login", methods=["POST"])
+def login():
+    ...
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
+
+    data = request.get_json()
+    existing_user = collection.find_one({"email": data['email']})
+    if not existing_user:
+        return jsonify({"error": "Email not found"}), 400
+    if existing_user["password"] != data['password']:
+        return jsonify({"error": "Incorrect Email and Password combination"}), 400
+    return jsonify({"user" : existing_user})
+
 
 
 if __name__ == '__main__':
