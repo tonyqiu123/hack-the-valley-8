@@ -25,29 +25,44 @@ CORS(app)
 #     return jsonify({"response": bot_response})
 
 """TODO video data route, add video data"""
-@app.route('/video-data', methods=['POST'])
-def video_data():
+@app.route('/input-new-video', methods=['POST'])
+def new_video():
     ...
     # connect to db
     db = client["test"]
-    collection = db["videos"]
-
+    videos = db["videos"]
+    users = db["users"]
     data = request.get_json()
+
+    user = users.find_one({"_id": int(data['user_id'])})
+    if not user:
+        return jsonify({"message": "User not found"}), 404    
+    
+    conversations = user.get("conversations", [])
     v_desc = get_video_description(data['video_id'])
     v_summ = summarize_text(v_desc)
     transcript = get_transcript(data['video_id'])
 
     current_time = str(datetime.now())
     re_time = time_format(current_time)
-
-    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+    new_id = videos.find_one(sort=[("_id", -1)])  # Get the latest document
     if new_id is not None:
         new_id = new_id["_id"] + 1  # Increment the latest _id
     else:
         new_id = 1  # First entry
 
     video = {"_id":new_id, "videoId": data['video_id'], "transcript": transcript, "summarization": v_summ, "createdAt": re_time}
-    result = collection.insert_one(video)
+    result = videos.insert_one(video)
+
+    new_conversation = {
+            "_id": str(uuid4()),
+            "videoId": videos.find_one(sort=[("createdAt", -1)]).get("videoId"),
+            "messages": []
+        }
+    conversations.append(new_conversation)
+
+    users.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
+
     if result.inserted_id:
         return jsonify(video)
 
