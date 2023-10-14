@@ -28,6 +28,26 @@ const Chat = () => {
             })
     }
 
+    const handleSubmitYoutubeUrl = async () => {
+        try {
+            setPhase('fetchingState');
+            const response = await fetch('http://localhost:5000/video-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ video_id: urlInput })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            setPhase('finishedFetching');
+        } catch (err) {
+            console.error('Error:', err);
+        }
+    }
+
     useEffect(() => {
         handleFetchUserData()
     }, [])
@@ -37,13 +57,13 @@ const Chat = () => {
             {loading ? <Loading className={`loading ${userData ? 'inactive' : ''}`} /> : <Unauthorized />}
             {userId && userData ?
                 <div className="chatPage">
-                    <ConversationHistory userData={userData} setPhase={setPhase} />
+                    <ConversationHistory setUserData={setUserData} userData={userData} setPhase={setPhase} />
                     <div style={{ paddingLeft: '300px' }}>
 
                         {phase === 'enterUrl' ?
                             <ChatEnterUrl>
                                 <Input style={{ width: '100%' }} placeHolder="Enter a youtube URL" search={urlInput} setSearch={setUrlInput} />
-                                <Button size="l" handleClick={async () => setPhase('fetchingState')} text='Send' variant='primary' />
+                                <Button size="l" handleClick={handleSubmitYoutubeUrl} text='Send' variant='primary' />
                             </ChatEnterUrl>
                             : null}
 

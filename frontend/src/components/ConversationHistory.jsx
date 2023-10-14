@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import Button from './Button'
 import Popover from './Popover'
 import '../css/Chat.css'
@@ -10,13 +9,34 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { useNavigate } from "react-router-dom"
 import '../css/ProgressBar.css'
 
-const ConversationHistory = ({ setPhase, userData }) => {
+const ConversationHistory = ({ setPhase, userData, setUserData }) => {
 
     const navigate = useNavigate()
 
     const handleLogout = () => {
         localStorage.removeItem('userId')
         navigate('/login')
+    }
+
+    const handleClearConversations = () => {
+        fetch('http://localhost:5000/clear', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: userData._id })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error('Error clearing conversations')
+                }
+            })
+            .then(data => setUserData(prev => ({ ...prev, conversations: [] })))
+            .catch(error => {
+                console.error("Error: ", error)
+            })
     }
 
     return (
@@ -47,7 +67,7 @@ const ConversationHistory = ({ setPhase, userData }) => {
                             <img src={DeleteIcon} />
                             <p>Buy more credits</p>
                         </div>
-                        <div className="popoverMenuItem">
+                        <div onClick={(e) => handleClearConversations()} className="popoverMenuItem">
                             <img src={DeleteIcon} />
                             <p>Clear conversation history</p>
                         </div>
