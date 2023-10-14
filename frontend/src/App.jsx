@@ -12,6 +12,10 @@ function App() {
     {
       url: '/chat',
       component: <Chat />
+    },
+    {
+      url: '*',
+      component: <NotFound />
     }
   ]
 
