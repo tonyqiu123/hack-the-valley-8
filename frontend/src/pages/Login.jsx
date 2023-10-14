@@ -14,6 +14,7 @@ const Login = () => {
 
     // Function to redirect to the /chat route
     const handleLogin = () => {
+        localStorage.setItem('userId', 234)
         navigate("/chat");
     };
 
