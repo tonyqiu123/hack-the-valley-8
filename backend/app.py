@@ -3,7 +3,6 @@ from flask_cors import CORS
 from helpers.cohere import generate_response
 from helpers.connect import mongod_connect
 from datetime import datetime
-from bson import ObjectId
 import re
 
 app = Flask(__name__)
@@ -62,16 +61,24 @@ def send_message():
     db = client["test"]
     collection = db["conversations"]
 
+    data = request.get_json()
+
     # use regex to format cur time
     current_time = str(datetime.now())
     re_time = re.sub(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d{6}', r'\1T\2', current_time)
 
+    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+    if new_id is not None:
+        new_id = new_id["_id"] + 1  # Increment the latest _id
+    else:
+        new_id = 1  # First entry
+
     new_entry = {
-        "_id": ObjectId(),
-        "userId": int(''.join(filter(str.isdigit, request.args.get("userId")))),
-        "videoId": request.args.get("videoId").strip(),
-        "entry": request.args.get("entry").strip(),
-        "speaker": request.args.get("speaker").strip(),
+        "_id": new_id,
+        "userId": data['userId'],
+        "videoId": data['videoId'],
+        "entry": data['entry'],
+        "speaker": data['speaker'],
         "createdAt": re_time
     }
     
@@ -82,6 +89,38 @@ def send_message():
         return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
     else:
         return jsonify({"message": "Entry creation failed"}, 500)
+
+
+"""sign in and user validation"""
+@app.route("/signup", methods=["POST"])
+def signup():
+    ...
+    # connect to db
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
+
+    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+    if new_id is not None:
+        new_id = new_id["_id"] + 1  # Increment the latest _id
+    else:
+        new_id = 1  # First entry
+    
+    data = request.get_json()
+    user = {
+        "id" : new_id,
+        "email" : data['email'],
+        "name" : data['name'],
+        "image" : data['image']
+    }
+
+    # TODO check database for existing users
+    print(user)
+    return jsonify({})
+
+@app.route("/login", methods=["POST"])
+def login():
+    ...
 
 
 
