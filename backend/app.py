@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from helpers.response import generate_response
+from helpers.response import generate_response, summarize_text
 from helpers.connect import mongod_connect
-from helpers.youtube import get_video_description
+from helpers.models import get_video_description, time_format
 from uuid import uuid4
 from datetime import datetime
 import re
@@ -33,9 +33,10 @@ def video_data():
     collection = db["videos"]
 
     data = request.get_json()
-    v_details = get_video_description(data['video_id'])
+    v_desc = get_video_description(data['video_id'])
+    v_summ = summarize_text(v_desc)
 
-    return jsonify(v_details)
+    return jsonify({"summary": v_summ})
 
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])
@@ -77,7 +78,7 @@ def send_message():
 
     # use regex to format curr time
     current_time = str(datetime.now())
-    re_time = re.sub(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d{6}', r'\1T\2', current_time)
+    re_time = time_format(current_time)
 
     new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
     if new_id is not None:
@@ -102,7 +103,7 @@ def send_message():
 
         # use regex to format cur time
         current_time = str(datetime.now())
-        re_time = re.sub(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d{6}', r'\1T\2', current_time)
+        re_time = time_format(current_time)
 
         new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
         if new_id is not None:

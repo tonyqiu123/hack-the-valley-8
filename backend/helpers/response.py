@@ -17,6 +17,10 @@ def generate_response(msg):
     return res
 
 def summarize_text(text):
-    co = cohere.Client('CekvF2K8mMYRlHb69H0mjicbkRI62n3i5f4cXZ5R')
-    response = co.summarize(text=text, length='auto', format='auto', model='summarize-xlarge', additional_command='', temperature=0.3)
-    return response.summary
+    try:
+        co = cohere.Client('CekvF2K8mMYRlHb69H0mjicbkRI62n3i5f4cXZ5R')
+        response = co.summarize(text=text, length='auto', format='auto', model='summarize-xlarge', additional_command='', temperature=0.3)
+        return response.summary
+    except:
+        # text too long for cohere api
+        return ""
