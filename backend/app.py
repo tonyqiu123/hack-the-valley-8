@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from helpers.response import generate_response, summarize_text
 from helpers.connect import mongod_connect
-from helpers.models import get_video_description, time_format
+from helpers.models import get_video_description, get_transcript, time_format
 from uuid import uuid4
 from datetime import datetime
 import re
@@ -35,8 +35,21 @@ def video_data():
     data = request.get_json()
     v_desc = get_video_description(data['video_id'])
     v_summ = summarize_text(v_desc)
+    transcript = get_transcript(data['video_id'])
 
-    return jsonify({"summary": v_summ})
+    current_time = str(datetime.now())
+    re_time = time_format(current_time)
+
+    new_id = collection.find_one(sort=[("_id", -1)])  # Get the latest document
+    if new_id is not None:
+        new_id = new_id["_id"] + 1  # Increment the latest _id
+    else:
+        new_id = 1  # First entry
+
+    video = {"_id":new_id, "transcript": transcript, "summarization": v_summ, "createdAt": re_time}
+    result = collection.insert_one(video)
+    if result.inserted_id:
+        return jsonify({"message": "Video documents created successfully", "inserted_id": str(result.inserted_id)})
 
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])

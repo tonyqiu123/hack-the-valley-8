@@ -1,6 +1,6 @@
 import requests
 import json
-# from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi
 import cohere
 import re
 
@@ -16,10 +16,10 @@ def time_format(datetime_str):
     return re.sub(r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d{6}', r'\1T\2', datetime_str)
 
 # this is too large of a dataset for free cohere api
-# def get_transcript(video_id):
-#     transcript = YouTubeTranscriptApi.get_transcript(video_id)
-#     full_transcript = " ".join([i['text'] for i in transcript])
-#     return full_transcript
+def get_transcript(video_id):
+    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    full_transcript = " ".join([i['text'] for i in transcript])
+    return full_transcript
 
 # tests
 # video_description = get_video_description('w8q0C-C1js4')
