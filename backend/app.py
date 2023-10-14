@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from helpers.cohere import generate_response
+from helpers.response import generate_response
 from helpers.connect import mongod_connect
 from datetime import datetime
 import re
@@ -15,15 +15,11 @@ def index():
     return jsonify(test_message)
 
 """chat route"""
-@app.route('/chat', methods=['GET', 'POST'])
+@app.route('/chat', methods=['POST'])
 def chat():
-    if request.method == 'POST':
-        user_prompt = request.form['user_prompt']
-        
-        return jsonify({"user_prompt": user_prompt})
-    else:
-        test_message = {"message":"chat route reached by GET"}
-        return jsonify(test_message)
+    data = request.get_json()
+    bot_response = generate_response(data['prompt'])
+    return jsonify({"response": bot_response})
 
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])
@@ -31,7 +27,7 @@ def connect():
     ...
     client = mongod_connect()
     db = client["test"]
-    collection = db["conversations"]
+    collection = db["users"]
     result = list(collection.find({}))      
     # return list of curr data, TESTING PURPOSES
     return jsonify(result)
