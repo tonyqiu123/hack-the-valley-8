@@ -64,7 +64,7 @@ def new_video():
     users.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
 
     if result.inserted_id:
-        return jsonify(video)
+        return jsonify({"conversation_id": new_conversation["_id"]})
 
 
 
