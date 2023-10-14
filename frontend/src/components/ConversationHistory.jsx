@@ -14,10 +14,6 @@ const ConversationHistory = ({ setPhase, userData, setUserData }) => {
 
     const navigate = useNavigate()
 
-    useEffect(() => {
-        console.log(userData)
-    }, [userData])
-
     const handleLogout = () => {
         localStorage.removeItem('userId')
         navigate('/login')
@@ -49,14 +45,18 @@ const ConversationHistory = ({ setPhase, userData, setUserData }) => {
             <div className="conversationContainer">
                 <Button handleClick={async () => setPhase('enterUrl')} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
                 {userData ? (
-                    userData.conversations.map((conversationData, index) => (
-                        <div className="conversationItem" key={index}>
-                            <p className="conversationText">
-                                {/* {conversationData.messages[0].message} */}
-                            </p>
-                        </div>
-                    ))
+                    userData.conversations
+                        .slice() // Create a shallow copy of the array to avoid modifying the original
+                        .reverse() // Reverse the copy
+                        .map((conversationData, index) => (
+                            <div className="conversationItem" key={index}>
+                                <p className="conversationText">
+                                    {conversationData.summary}
+                                </p>
+                            </div>
+                        ))
                 ) : null}
+
             </div>
 
             <div className="bottomContainer">

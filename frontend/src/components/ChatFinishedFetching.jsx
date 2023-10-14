@@ -27,7 +27,7 @@ const ChatFinishedFetching = ({ children, conversationData }) => {
                 right={
                     <div className='chatFinished-right'>
                         <div ref={messageBodyRef} className='chatFinished-right-messageBody'>
-                            {conversationData.messages.map((message, index) => (
+                            {conversationData.messages?.length > 0 && conversationData.messages.map((message, index) => (
                                 <div key={index} className='chatFinished-right-message'>
                                     <img
                                         style={{ width: '32px' }}
