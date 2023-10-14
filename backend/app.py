@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from helpers.response import generate_response, summarize_text
-from helpers.connect import mongod_connect
+from helpers.connect import get_mongo_client
 from helpers.models import get_video_description, get_transcript, time_format
 from uuid import uuid4
 from datetime import datetime
 import re
 
 app = Flask(__name__)
+client = get_mongo_client()
 CORS(app)
 
 # """root route"""
@@ -28,7 +29,6 @@ CORS(app)
 def video_data():
     ...
     # connect to db
-    client = mongod_connect()
     db = client["test"]
     collection = db["videos"]
 
@@ -57,7 +57,6 @@ def video_data():
 @app.route('/connect', methods=['GET'])
 def connect():
     ...
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
     result = list(collection.find({}))      
@@ -69,7 +68,6 @@ def connect():
 @app.route('/userinfo', methods=['GET'])
 def userinfo():
     ...
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
     user_id = int(request.args.get("user_id"))
@@ -87,7 +85,6 @@ def video_conversation_history():
     user_id = int(request.args.get("user_id"))
     target_conversation_id = request.args.get("target_conversation_id")
 
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
     user = collection.find_one({"_id": user_id})
@@ -111,7 +108,6 @@ def user_conversation_history():
     # get all conversation key value pairs
     user_id = int(request.args.get("user_id"))
 
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
     user = collection.find_one({"_id": user_id})
@@ -129,7 +125,6 @@ def user_conversation_history():
 @app.route('/send-message', methods=['POST'])
 def send_message():
     ...
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
     videos = db["videos"]
@@ -137,7 +132,6 @@ def send_message():
     # need users_id, conversations_id
     data = request.get_json()
 
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
     user = collection.find_one({"_id": int(data['user_id'])})
@@ -200,7 +194,6 @@ def send_message():
 @app.route("/clear", methods=["POST"])
 def clear():
     # Connect to the database
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
 
@@ -226,7 +219,6 @@ def clear():
 def signup():
     ...
     # connect to db
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
 
@@ -250,7 +242,9 @@ def signup():
         "email" : data['email'],
         "password" : data['password'],
         "name" : data['name'],
-        "userToken" : str(uuid4())
+        "userToken" : str(uuid4()),
+        "maxCredits": 5,
+        "creditsUsed": 0
     }
     
     # Insert the new entry into the MongoDB collection
@@ -266,7 +260,6 @@ def signup():
 @app.route("/login", methods=["POST"])
 def login():
     ...
-    client = mongod_connect()
     db = client["test"]
     collection = db["users"]
 
@@ -278,6 +271,14 @@ def login():
         return jsonify({"error": "Incorrect Email and Password combination"}), 400
     return jsonify({"user" : existing_user})
 
+
+
+@app.route("/pay", methods=['POST'])
+def pay():
+    db = client["test"]
+    collection = db["users"]
+    # 
+    data = request.get_json()
 
 
 if __name__ == '__main__':
