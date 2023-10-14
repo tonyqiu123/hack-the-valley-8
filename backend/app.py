@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from helpers.response import generate_response
 from helpers.connect import mongod_connect
+from helpers.youtube import get_video_description
+from uuid import uuid4
 from datetime import datetime
 import re
 
@@ -20,6 +22,20 @@ CORS(app)
 #     data = request.get_json()
 #     bot_response = generate_response(data['prompt'])
 #     return jsonify({"response": bot_response})
+
+"""get video data route"""
+@app.route('/video-data', methods=['POST'])
+def video_data():
+    ...
+    # connect to db
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["videos"]
+
+    data = request.get_json()
+    v_details = get_video_description(data['video_id'])
+
+    return jsonify(v_details)
 
 """connect to DB and CRUD routes"""
 @app.route('/connect', methods=['GET'])
@@ -135,9 +151,10 @@ def signup():
     
     user = {
         "_id" : new_id,
+        "userToken" : str(uuid4()),
         "email" : data['email'],
-        "name" : data['name'],
-        "image" : data['image']
+        "password" : data['password'],
+        "name" : data['name']
     }
     
     # Insert the new entry into the MongoDB collection
@@ -151,7 +168,17 @@ def signup():
 @app.route("/login", methods=["POST"])
 def login():
     ...
+    client = mongod_connect()
+    db = client["test"]
+    collection = db["users"]
 
+    data = request.get_json()
+    existing_user = collection.find_one({"email": data['email']})
+    if not existing_user:
+        return jsonify({"error": "Email not found"}), 400
+    if existing_user["password"] != data['password']:
+        return jsonify({"error": "Incorrect Email and Password combination"}), 400
+    return jsonify({"userToken" : existing_user["userToken"]})
 
 
 if __name__ == '__main__':
