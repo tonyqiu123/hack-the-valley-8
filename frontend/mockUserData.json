@@ -1,0 +1,67 @@
+{
+  "_id": 1,
+  "userToken": "116f4c76-8556-436b-a943-0a14db92015d",
+  "email": "example1@email.com",
+  "password": "dsadahdsadad",
+  "name": "Dan Li",
+  "maxCredits": "5",
+  "conversations": [
+    {
+      "_id": "dslfdslkfjkfdsfds",
+      "videoId": "fdslkjfdsfdsj",
+      "summarization": "sdjfldsfds",
+      "messages": [
+        {
+          "_id": "dslkfjdlf",
+          "speaker": "user",
+          "message": "sdlfjdsfdsfjlds",
+          "createdAt": ""
+        },
+        {
+          "_id": "dslkfjdlf",
+          "speaker": "bot",
+          "message": "sdlfjdsfdsfjlds",
+          "createdAt": ""
+        }
+      ]
+    },
+    {
+      "_id": "dslfdslkfjkfdsfds",
+      "videoId": "fdslkjfdsfdsj",
+      "summarization": "sdjfldsfds",
+      "messages": [
+        {
+          "_id": "dslkfjdlf",
+          "speaker": "user",
+          "message": "sdlfjdsfdsfjlds",
+          "createdAt": ""
+        },
+        {
+          "_id": "dslkfjdlf",
+          "speaker": "bot",
+          "message": "sdlfjdsfdsfjlds",
+          "createdAt": ""
+        }
+      ]
+    },
+    {
+      "_id": "dslfdslkfjkfdsfds",
+      "videoId": "fdslkjfdsfdsj",
+      "summarization": "sdjfldsfds",
+      "messages": [
+        {
+          "_id": "dslkfjdlf",
+          "speaker": "user",
+          "message": "sdlfjdsfdsfjlds",
+          "createdAt": ""
+        },
+        {
+          "_id": "dslkfjdlf",
+          "speaker": "bot",
+          "message": "sdlfjdsfdsfjlds",
+          "createdAt": ""
+        }
+      ]
+    }
+  ]
+}

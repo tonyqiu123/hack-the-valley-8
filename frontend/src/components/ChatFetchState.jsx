@@ -5,14 +5,18 @@ import { useEffect } from 'react';
 
 const ChatFetchState = ({ phase, setPhase }) => {
     useEffect(() => {
-        // Use a setTimeout to change the phase after 2 seconds
-        const timeout = setTimeout(() => {
-            setPhase('finishedFetching');
-        }, 2000);
+        let timeout;
+
+        if (phase === 'fetchingState') {
+            // Use a setTimeout to change the phase after 2 seconds
+            timeout = setTimeout(() => {
+                setPhase('finishedFetching');
+            }, 2000);
+        }
 
         // Clean up the timeout to prevent memory leaks
         return () => clearTimeout(timeout);
-    }, [setPhase]);
+    }, [phase, setPhase]);
 
     return (
         <div className={`chatPageBody fetchingState ${phase === 'fetchingState' ? 'active' : 'inactive'}`}>
