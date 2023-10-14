@@ -31,17 +31,18 @@ const Chat = () => {
     const handleSubmitYoutubeUrl = async () => {
         try {
             setPhase('fetchingState');
-            const response = await fetch('http://localhost:5000/video-data', {
+            const response = await fetch('http://localhost:5000/input-new-video', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ video_id: urlInput })
+                body: JSON.stringify({ user_id: userData._id, video_id: urlInput })
             });
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+            setUserData(prev => ({ ...prev,  }))
             setPhase('finishedFetching');
         } catch (err) {
             console.error('Error:', err);
