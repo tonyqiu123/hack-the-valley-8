@@ -107,21 +107,32 @@ def signup():
         new_id = 1  # First entry
     
     data = request.get_json()
+
+    # TODO check database for existing users
+    existing_user = collection.find_one({"email": data['email']})
+
+    if existing_user:
+        return jsonify({"error": "Email already exists"}), 400
+    
     user = {
-        "id" : new_id,
+        "_id" : new_id,
         "email" : data['email'],
         "name" : data['name'],
         "image" : data['image']
     }
-
-    # TODO check database for existing users
-    print(user)
-    return jsonify({})
+    
+    # Insert the new entry into the MongoDB collection
+    result = collection.insert_one(user)
+    
+    if result.inserted_id:
+        return jsonify({"message": "Entry created successfully", "inserted_id": str(result.inserted_id)})
+    else:
+        return jsonify({"message": "Entry creation failed"}, 500)
 
 @app.route("/login", methods=["POST"])
 def login():
     ...
-
+    
 
 
 if __name__ == '__main__':
