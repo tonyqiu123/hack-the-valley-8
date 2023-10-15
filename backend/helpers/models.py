@@ -17,7 +17,10 @@ def time_format(datetime_str):
 
 # this is too large of a dataset for free cohere api
 def get_transcript(video_id):
-    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    except:
+        return ""
     full_transcript = " ".join([i['text'] for i in transcript])
     return full_transcript
 
