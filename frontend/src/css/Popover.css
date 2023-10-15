@@ -9,6 +9,7 @@
     perspective: 1000px;
     transform: scale(0.95);
     z-index: 1001;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     transition: all 250ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 

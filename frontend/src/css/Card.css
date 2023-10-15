@@ -1,0 +1,25 @@
+.card {
+    border: 1px solid #E2E2E2;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+}
+
+.s.card {
+    padding: 16px;
+}
+
+.m.card {
+    padding: 24px;
+}
+
+.l.card {
+    padding: 32px;
+}
+
+/* darkMode */
+.darkMode.card {
+    border: 1px solid #3a3a3a;
+    background-color: #000000;
+}

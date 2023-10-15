@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import Button from './Button'
 import Popover from './Popover'
 import '../css/Chat.css'
@@ -6,59 +5,97 @@ import DeleteIcon from '../assets/delete.svg'
 import LogoutIcon from '../assets/logout.svg'
 import ProfileIcon from '../assets/profile.svg'
 import PlusIcon from '../assets/plus.svg'
+import ProgressBar from "@ramonak/react-progress-bar";
+import { useNavigate } from "react-router-dom"
+import '../css/ProgressBar.css'
+import cashIcon from '../assets/cash.svg'
+import { Toaster, toast } from 'sonner'
+import tripleDotsIcon from '../assets/tripleDots.svg'
 
-const ConversationHistory = () => {
+const ConversationHistory = ({ selectedConversationId, setSelectedConversationId, setPhase, userData, setUserData, setShowBuyAlert }) => {
 
-    const [ConversationHistoryData, setConversationHistoryData] = useState(null)
+    const navigate = useNavigate()
 
-    const fetchConversationHistoryData = () => {
-        fetch('../../mockConversations.json')
-            .then(res => res.json())
+    const handleLogout = () => {
+        localStorage.removeItem('userId')
+        navigate('/login')
+    }
+
+    const handleClearConversations = () => {
+        fetch('http://localhost:5000/clear', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: userData._id })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error('Error clearing conversations');
+                }
+            })
             .then(data => {
-                setConversationHistoryData(data)
+                setSelectedConversationId(null)
+                setPhase('enterUrl')
+                setUserData(prev => ({ ...prev, conversations: [] }));
+                toast.success('Successfully cleared conversations');
             })
             .catch(error => {
-                console.error('Error fetching data: ', error)
-            })
+                console.error("Error: ", error);
+            });
     }
-    useEffect(() => {
-        fetchConversationHistoryData()
-    }, [ConversationHistoryData])
 
     return (
-        <div className="conversationHistory">
-            <div className="conversationContainer">
-                <Button imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
-                {ConversationHistoryData ? (
-                    ConversationHistoryData.map((conversationData, index) => (
-                        <div className="conversationItem" key={index}>
-                            <p className="conversationText">
-                                {conversationData.entry}
-                            </p>
-                        </div>
-                    ))
-                ) : null}
-            </div>
+        <>
+            <Toaster richColors />
+            <div className="conversationHistory">
+                <div className="conversationContainer">
+                    <Button handleClick={async () => { setPhase('enterUrl'); setSelectedConversationId(null) }} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
+                    <p style={{ color: 'grey', fontSize:'13px', margin:'16px 0 -12px 0' }}>Conversations</p>
+                    {userData ? (
+                        userData.conversations
+                            .slice() // Create a shallow copy of the array to avoid modifying the original
+                            .reverse() // Reverse the copy
+                            .map((conversationData, index) => (
+                                <div className={`conversationItem ${selectedConversationId === conversationData._id ? 'active' : ''}`} onClick={(e) => setSelectedConversationId(conversationData._id)} key={index}>
+                                    <p className="conversationText">
+                                        {conversationData.summary}
+                                    </p>
+                                </div>
+                            ))
+                    ) : null}
 
-            <div className="bottomContainer">
-                <Popover position="up-right">
-                    <div className="popoverItem">
-                        <img style={{ height: '24px', width: '24px' }} src={ProfileIcon} />
-                        <p>Tony Qiu</p>
-                    </div>
-                    <div className="popoverMenu">
-                        <div className="popoverMenuItem">
-                            <img src={DeleteIcon} />
-                            <p>Clear conversation history</p>
+                </div>
+
+                <div className="bottomContainer">
+                    <Popover position="up-right">
+                        <div className="popoverItem">
+                            <img style={{ height: '24px', width: '24px' }} src={ProfileIcon} />
+                            <p>{userData.name}</p>
+                            <img style={{ filter: 'brightness(80%)', height: '16px', marginLeft: 'auto' }} src={tripleDotsIcon} />
                         </div>
-                        <div className="popoverMenuItem">
-                            <img src={LogoutIcon} />
-                            <p>Log out</p>
+                        <div className="popoverMenu">
+                            <div onClick={(e) => setShowBuyAlert(true)} className="popoverMenuItem">
+                                <img src={cashIcon} />
+                                <p>Buy more credits</p>
+                            </div>
+                            <div onClick={(e) => handleClearConversations()} className="popoverMenuItem">
+                                <img src={DeleteIcon} />
+                                <p>Clear conversation history</p>
+                            </div>
+                            <div onClick={(e) => handleLogout()} className="popoverMenuItem">
+                                <img src={LogoutIcon} />
+                                <p>Log out</p>
+                            </div>
                         </div>
-                    </div>
-                </Popover>
+                    </Popover>
+                    <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
+                    <ProgressBar height='22px' labelClassName='progressBarLabel' bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

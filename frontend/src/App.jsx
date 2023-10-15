@@ -4,15 +4,8 @@ import Chat from './pages/Chat'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import React, {
-  createContext, useState
-} from 'react';
-
-export const UserContext = createContext({ user: null, setUser: () => { } });
 
 function App() {//asdf
-
-  const [user, setUser] = useState(null)
 
   const pages = [
     {
@@ -38,13 +31,11 @@ function App() {//asdf
   ]
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      <Routes>
-        {pages.map((pageData, index) => (
-          <Route key={index} path={pageData.url} element={pageData.component} />
-        ))}
-      </Routes>
-    </UserContext.Provider>
+    <Routes>
+      {pages.map((pageData, index) => (
+        <Route key={index} path={pageData.url} element={pageData.component} />
+      ))}
+    </Routes>
   )
 }
 

@@ -3,7 +3,7 @@ import '../css/SplitView.css'
 import DividerIcon from '../assets/divider.svg'
 
 
-const MIN_WIDTH = 200;
+const MIN_WIDTH = 300;
 
 
 const LeftPane = ({ children, leftWidth, setLeftWidth }) => {
