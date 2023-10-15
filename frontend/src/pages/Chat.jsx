@@ -11,6 +11,7 @@ import Loading from './Loading'
 import Alert from '../components/Alert'
 import Card from '../components/Card'
 import closeIcon from '../assets/close.svg'
+import ProgressBar from "@ramonak/react-progress-bar"
 
 const Chat = () => {
 
@@ -32,7 +33,7 @@ const Chat = () => {
             })
     }
 
-    
+
 
     const handleSubmitYoutubeUrl = async () => {
         try {
@@ -91,27 +92,34 @@ const Chat = () => {
 
     return (
         <>
-            <Alert showAlert={showBuyAlert} setShowAlert={setShowBuyAlert}>
-                <Card>
-                    <img style={{ cursor: 'pointer', width: '16px', position: 'absolute', right: '16px', top: '16px' }} onClick={(e) => setShowBuyAlert(false)} src={closeIcon} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <h4>Buy more credits.</h4>
-                        <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />
-                    </div>
-                </Card>
-            </Alert>
-            <Alert showAlert={showAlert} setShowAlert={setShowAlert}>
-                <Card>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <h4>Insufficient funds!</h4>
-                        <p>You used up all your credits. Click the blue button to buy more.</p>
-                        <div style={{ display: 'flex', gap: '8px', margin: '24px 0 0 auto' }}>
-                            <Button handleClick={async () => setShowAlert(false)} text='Cancel' variant='outline' size='l' />
-                            <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />
-                        </div>
-                    </div>
-                </Card>
-            </Alert>
+            {userData &&
+                <>
+                    <Alert showAlert={showBuyAlert} setShowAlert={setShowBuyAlert}>
+                        <Card style={{ alignItems: 'center', gap: '40px', padding: '40px', minWidth: '500px' }}>
+                            <img style={{ cursor: 'pointer', width: '16px', position: 'absolute', right: '16px', top: '16px' }} onClick={(e) => setShowBuyAlert(false)} src={closeIcon} />
+                            <h1>Buy more credits.</h1>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
+                                {userData && <ProgressBar bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />}
+                            </div>
+                            <Button handleClick={async () => setShowAlert(false)} text='Buy more credits' variant='primary' size='l' />
+                            <h2>$1 = 1 credit</h2>
+                        </Card>
+                    </Alert>
+                    <Alert showAlert={showAlert} setShowAlert={setShowAlert}>
+                        <Card>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <h4>Insufficient funds!</h4>
+                                <p>You used up all your credits. Click the blue button to buy more.</p>
+                                <div style={{ display: 'flex', gap: '8px', margin: '24px 0 0 auto' }}>
+                                    <Button handleClick={async () => setShowAlert(false)} text='Cancel' variant='outline' size='l' />
+                                    <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />
+                                </div>
+                            </div>
+                        </Card>
+                    </Alert>
+                </>
+            }
             {loading ? <Loading className={`loadingPage ${userData ? 'inactive' : ''}`} /> : <Unauthorized />}
             {userId && userData ?
                 <div className="chatPage">

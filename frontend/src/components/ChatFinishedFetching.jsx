@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import '../css/Chat.css';
 import SplitView from './SplitView';
 import Input from './Input';
+import Card from './Card'
 import Button from './Button';
 
 const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId }) => {
     const messageBodyRef = useRef(null);
 
     const [messageInput, setMessageInput] = useState('')
+    const [videoId, setVideoId] = useState(null)
 
     useEffect(() => {
         // Scroll to the bottom of the messageBody element on render
@@ -16,6 +18,11 @@ const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId })
         }
     }, [selectedConversationId, userData]);
 
+    useEffect(() => {
+        if (userData) {
+            setVideoId(userData.conversations.filter(_ => _._id === selectedConversationId)[0].videoId.split("v=")[1])
+        }
+    }, [selectedConversationId])
 
     const handleSendMessage = async () => {
         const data = {
@@ -65,10 +72,7 @@ const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId })
             <SplitView
                 left={
                     <div className='chatFinished-left'>
-                        <img
-                            className='chatVideo'
-                            src="https://cdn.discordapp.com/attachments/715319623637270638/1162597796239659038/image_12.png?ex=653c8492&is=652a0f92&hm=0bc2d948dfbc3a4db177268a9db633ab5b4ef64b39b5a1632509a08a7551370a&"
-                        />
+                        <iframe width='100%' height='100%' style={{ border: 'none', borderRadius: '24px' }} src={`https://www.youtube.com/embed/${videoId}`} allowFullScreen></iframe>
                     </div>
                 }
                 right={
@@ -84,15 +88,15 @@ const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId })
                                                 : 'https://cdn.discordapp.com/attachments/715319623637270638/1162640579222569030/image.png?ex=653cac6a&is=652a376a&hm=02f7b5456ac88219f9fcf8c042f2c485e2a15187b77f21dcd21b355d9868898f&'
                                         }
                                     />
-                                    <p style={{ transform: 'translateY(5px)' }} key={index}>
+                                    <p style={{ marginTop: '5px' }} key={index}>
                                         {message.message}
                                     </p>
                                 </div>
                             ))}
                         </div>
                         <div className='chatFinished-right-inputField'>
-                            <Input style={{ width: '100%' }} placeHolder="Send a message" search={messageInput} setSearch={setMessageInput} />
-                            <Button handleClick={handleSendMessage} size='l' text='Send Message' variant='primary' />
+                            <Input style={{ width: '100%' }} placeHolder="Ask about the video" search={messageInput} setSearch={setMessageInput} />
+                            <Button handleClick={handleSendMessage} size='l' text='Send message' variant='primary' />
                         </div>
                     </div>
                 }

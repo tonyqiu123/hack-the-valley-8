@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom"
 import '../css/ProgressBar.css'
 import cashIcon from '../assets/cash.svg'
 import { Toaster, toast } from 'sonner'
-
+import tripleDotsIcon from '../assets/tripleDots.svg'
 
 const ConversationHistory = ({ selectedConversationId, setSelectedConversationId, setPhase, userData, setUserData, setShowBuyAlert }) => {
 
@@ -53,6 +53,7 @@ const ConversationHistory = ({ selectedConversationId, setSelectedConversationId
             <div className="conversationHistory">
                 <div className="conversationContainer">
                     <Button handleClick={async () => { setPhase('enterUrl'); setSelectedConversationId(null) }} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
+                    <p style={{ color: 'grey', fontSize:'13px', margin:'16px 0 -12px 0' }}>Conversations</p>
                     {userData ? (
                         userData.conversations
                             .slice() // Create a shallow copy of the array to avoid modifying the original
@@ -69,12 +70,11 @@ const ConversationHistory = ({ selectedConversationId, setSelectedConversationId
                 </div>
 
                 <div className="bottomContainer">
-                    <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
-                    <ProgressBar bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />
                     <Popover position="up-right">
                         <div className="popoverItem">
                             <img style={{ height: '24px', width: '24px' }} src={ProfileIcon} />
                             <p>{userData.name}</p>
+                            <img style={{ filter: 'brightness(80%)', height: '16px', marginLeft: 'auto' }} src={tripleDotsIcon} />
                         </div>
                         <div className="popoverMenu">
                             <div onClick={(e) => setShowBuyAlert(true)} className="popoverMenuItem">
@@ -91,6 +91,8 @@ const ConversationHistory = ({ selectedConversationId, setSelectedConversationId
                             </div>
                         </div>
                     </Popover>
+                    <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
+                    <ProgressBar height='22px' labelClassName='progressBarLabel' bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />
                 </div>
             </div>
         </>

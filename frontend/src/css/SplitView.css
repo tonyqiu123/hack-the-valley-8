@@ -8,12 +8,13 @@
 .divider {
   height: 100%;
   width: 14px;
-  background-color: rgb(245, 245, 245);
+  background-color: rgb(240, 240, 240);
   display: flex;
   justify-content: center;
+  transition: all .2s;
 }
-.divider:hover {
-  background-color: rgb(238, 238, 238);
+.divider:active {
+  background-color: rgb(200, 200, 200);
 }
 
 .rightPane {
