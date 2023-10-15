@@ -8,6 +8,9 @@ import ChatFetchState from "../components/ChatFetchState"
 import ChatFinishedFetching from "../components/ChatFinishedFetching"
 import Unauthorized from './Unauthorized'
 import Loading from './Loading'
+import Alert from '../components/Alert'
+import Card from '../components/Card'
+import closeIcon from '../assets/close.svg'
 
 const Chat = () => {
 
@@ -18,6 +21,8 @@ const Chat = () => {
     const [userId, setUserId] = useState(localStorage.getItem('userId'))
     const [loading, setLoading] = useState(true)
     const [selectedConversation, setSelectedConversation] = useState(null)
+    const [showAlert, setShowAlert] = useState(false)
+    const [showBuyAlert, setShowBuyAlert] = useState(false)
 
     const handleFetchUserData = () => {
         fetch('http://localhost:5000/userinfo?user_id=1')
@@ -30,6 +35,10 @@ const Chat = () => {
 
     const handleSubmitYoutubeUrl = async () => {
         try {
+            if (userData.creditsUsed === userData.maxCredits) {
+                setShowAlert(true)
+                return
+            }
             setPhase('fetchingState');
             const response = await fetch('http://localhost:5000/input-new-video', {
                 method: 'POST',
@@ -45,6 +54,7 @@ const Chat = () => {
             const data = await response.json()
             setUserData(prevData => ({
                 ...prevData,
+                creditsUsed: prevData.creditsUsed + 1,
                 conversations: [
                     ...prevData.conversations,
                     {
@@ -68,10 +78,31 @@ const Chat = () => {
 
     return (
         <>
+            <Alert showAlert={showBuyAlert} setShowAlert={setShowBuyAlert}>
+                <Card>
+                    <img style={{ cursor:'pointer', width:'16px', position:'absolute', right:'16px', top:'16px' }} onClick={(e) => setShowBuyAlert(false)} src={closeIcon} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <h4>Buy more credits.</h4>
+                        <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />
+                    </div>
+                </Card>
+            </Alert>
+            <Alert showAlert={showAlert} setShowAlert={setShowAlert}>
+                <Card>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <h4>Insufficient funds!</h4>
+                        <p>You used up all your credits. Click the blue button to buy more.</p>
+                        <div style={{ display: 'flex', gap: '8px', margin: '24px 0 0 auto' }}>
+                            <Button handleClick={async () => setShowAlert(false)} text='Cancel' variant='outline' size='l' />
+                            <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />
+                        </div>
+                    </div>
+                </Card>
+            </Alert>
             {loading ? <Loading className={`loading ${userData ? 'inactive' : ''}`} /> : <Unauthorized />}
             {userId && userData ?
                 <div className="chatPage">
-                    <ConversationHistory setUserData={setUserData} userData={userData} setPhase={setPhase} />
+                    <ConversationHistory setShowBuyAlert={setShowBuyAlert} setUserData={setUserData} userData={userData} setPhase={setPhase} />
                     <div style={{ paddingLeft: '300px' }}>
 
                         {phase === 'enterUrl' ?
