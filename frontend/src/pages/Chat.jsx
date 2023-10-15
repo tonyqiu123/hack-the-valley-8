@@ -32,6 +32,8 @@ const Chat = () => {
             })
     }
 
+    
+
     const handleSubmitYoutubeUrl = async () => {
         try {
             if (userData.creditsUsed === userData.maxCredits) {
