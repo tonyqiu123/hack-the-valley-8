@@ -3,6 +3,7 @@ from flask_cors import CORS
 from helpers.response import generate_response, summarize_text
 from helpers.connect import get_mongo_client
 from helpers.models import get_video_description, get_transcript, time_format
+# from helpers.payment import 
 from uuid import uuid4
 from datetime import datetime
 import re
@@ -28,11 +29,16 @@ CORS(app)
 @app.route('/input-new-video', methods=['POST'])
 def new_video():
     ...
-    # connect to db
+    
     db = client["test"]
     videos = db["videos"]
     users = db["users"]
     data = request.get_json()
+    
+    v_id = ''
+    match = re.search(r"(?<=v=)[\w-]+", data['video_id'])
+    if match:
+        v_id = match.group(0)
 
     user = users.find_one({"_id": int(data['user_id'])})
     if not user:
@@ -44,9 +50,9 @@ def new_video():
     users.update_one({"_id": int(data['user_id'])}, {"$inc": {"creditsUsed": 1}})
     
     conversations = user.get("conversations", [])
-    v_desc = get_video_description(data['video_id'])
+    v_desc = get_video_description(v_id)
     v_summ = summarize_text(v_desc)
-    transcript = get_transcript(data['video_id'])
+    transcript = get_transcript(v_id)
 
     current_time = str(datetime.now())
     re_time = time_format(current_time)
@@ -301,8 +307,10 @@ def pay():
     data = request.get_json()
     
     user = collection.find_one({"_id": int(data['user_id'])})
-    print(user)
+    
 
+
+    collection.update_one({"_id": int(data['user_id'])}, {"$inc": {"maxCredits": 1}})
     return jsonify({"message": "successfull payment"}, 200)
 
 if __name__ == '__main__':
