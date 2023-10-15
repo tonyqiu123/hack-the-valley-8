@@ -8,9 +8,11 @@ import PlusIcon from '../assets/plus.svg'
 import ProgressBar from "@ramonak/react-progress-bar";
 import { useNavigate } from "react-router-dom"
 import '../css/ProgressBar.css'
-import { useEffect } from 'react'
+import cashIcon from '../assets/cash.svg'
+import { Toaster, toast } from 'sonner'
 
-const ConversationHistory = ({ setPhase, userData, setUserData }) => {
+
+const ConversationHistory = ({ selectedConversationId, setSelectedConversationId, setPhase, userData, setUserData, setShowBuyAlert }) => {
 
     const navigate = useNavigate()
 
@@ -29,61 +31,69 @@ const ConversationHistory = ({ setPhase, userData, setUserData }) => {
         })
             .then(response => {
                 if (response.status === 200) {
-                    return response.json()
+                    return response.json();
                 } else {
-                    throw new Error('Error clearing conversations')
+                    throw new Error('Error clearing conversations');
                 }
             })
-            .then(data => setUserData(prev => ({ ...prev, conversations: [] })))
-            .catch(error => {
-                console.error("Error: ", error)
+            .then(data => {
+                setSelectedConversationId(null)
+                setPhase('enterUrl')
+                setUserData(prev => ({ ...prev, conversations: [] }));
+                toast.success('Successfully cleared conversations');
             })
+            .catch(error => {
+                console.error("Error: ", error);
+            });
     }
 
     return (
-        <div className="conversationHistory">
-            <div className="conversationContainer">
-                <Button handleClick={async () => setPhase('enterUrl')} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
-                {userData ? (
-                    userData.conversations
-                        .slice() // Create a shallow copy of the array to avoid modifying the original
-                        .reverse() // Reverse the copy
-                        .map((conversationData, index) => (
-                            <div className="conversationItem" key={index}>
-                                <p className="conversationText">
-                                    {conversationData.summary}
-                                </p>
+        <>
+            <Toaster richColors />
+            <div className="conversationHistory">
+                <div className="conversationContainer">
+                    <Button handleClick={async () => { setPhase('enterUrl'); setSelectedConversationId(null) }} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
+                    {userData ? (
+                        userData.conversations
+                            .slice() // Create a shallow copy of the array to avoid modifying the original
+                            .reverse() // Reverse the copy
+                            .map((conversationData, index) => (
+                                <div className={`conversationItem ${selectedConversationId === conversationData._id ? 'active' : ''}`} onClick={(e) => setSelectedConversationId(conversationData._id)} key={index}>
+                                    <p className="conversationText">
+                                        {conversationData.summary}
+                                    </p>
+                                </div>
+                            ))
+                    ) : null}
+
+                </div>
+
+                <div className="bottomContainer">
+                    <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
+                    <ProgressBar bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />
+                    <Popover position="up-right">
+                        <div className="popoverItem">
+                            <img style={{ height: '24px', width: '24px' }} src={ProfileIcon} />
+                            <p>{userData.name}</p>
+                        </div>
+                        <div className="popoverMenu">
+                            <div onClick={(e) => setShowBuyAlert(true)} className="popoverMenuItem">
+                                <img src={cashIcon} />
+                                <p>Buy more credits</p>
                             </div>
-                        ))
-                ) : null}
-
+                            <div onClick={(e) => handleClearConversations()} className="popoverMenuItem">
+                                <img src={DeleteIcon} />
+                                <p>Clear conversation history</p>
+                            </div>
+                            <div onClick={(e) => handleLogout()} className="popoverMenuItem">
+                                <img src={LogoutIcon} />
+                                <p>Log out</p>
+                            </div>
+                        </div>
+                    </Popover>
+                </div>
             </div>
-
-            <div className="bottomContainer">
-                <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
-                <ProgressBar bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />
-                <Popover position="up-right">
-                    <div className="popoverItem">
-                        <img style={{ height: '24px', width: '24px' }} src={ProfileIcon} />
-                        <p>{userData.name}</p>
-                    </div>
-                    <div className="popoverMenu">
-                        <div className="popoverMenuItem">
-                            <img src={DeleteIcon} />
-                            <p>Buy more credits</p>
-                        </div>
-                        <div onClick={(e) => handleClearConversations()} className="popoverMenuItem">
-                            <img src={DeleteIcon} />
-                            <p>Clear conversation history</p>
-                        </div>
-                        <div onClick={(e) => handleLogout()} className="popoverMenuItem">
-                            <img src={LogoutIcon} />
-                            <p>Log out</p>
-                        </div>
-                    </div>
-                </Popover>
-            </div>
-        </div>
+        </>
     );
 }
 
