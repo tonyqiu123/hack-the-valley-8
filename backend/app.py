@@ -156,6 +156,7 @@ def send_message():
     db = client["test"]
     collection = db["users"]
     videos = db["videos"]
+    video = videos.find_one(sort=[("createdAt", -1)])
     dialogue = []
 
     # need users_id, conversations_id
@@ -186,7 +187,7 @@ def send_message():
             bot_doc = {
                 "_id": str(uuid4()),
                 "createdAt": re_time,
-                "message": generate_response(data['message']),
+                "message": generate_response(data['message'], video.get("videoId")),
                 "speaker": "bot"
             }
             conversation["messages"].append(bot_doc)
@@ -198,7 +199,7 @@ def send_message():
         re_time = time_format(current_time)
         new_conversation = {
             "_id": data['conversation_id'],
-            "videoId": videos.find_one(sort=[("createdAt", -1)]).get("videoId"),
+            "videoId": video.get("videoId"),
             "messages": [
                 {
                     "_id": str(uuid4()),
@@ -209,7 +210,7 @@ def send_message():
                 {
                     "_id": str(uuid4()),
                     "speaker": "bot",
-                    "message": generate_response(data['message']),
+                    "message": generate_response(data['message'], video.get("videoId")),
                     "createdAt": re_time
                 }
             ]
