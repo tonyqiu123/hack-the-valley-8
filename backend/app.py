@@ -156,6 +156,7 @@ def send_message():
     db = client["test"]
     collection = db["users"]
     videos = db["videos"]
+    dialogue = []
 
     # need users_id, conversations_id
     data = request.get_json()
@@ -180,6 +181,7 @@ def send_message():
                 "speaker": "user"
             }
             conversation["messages"].append(user_doc)
+            dialogue.append(user_doc)
             
             bot_doc = {
                 "_id": str(uuid4()),
@@ -188,6 +190,7 @@ def send_message():
                 "speaker": "bot"
             }
             conversation["messages"].append(bot_doc)
+            dialogue.append(bot_doc)
             break
 
     else:
@@ -211,11 +214,12 @@ def send_message():
                 }
             ]
         }
+        dialogue.append(new_conversation["messages"])
         conversations.append(new_conversation)
 
     collection.update_one({"_id": int(data['user_id'])}, {"$set": {"conversations": conversations}})
 
-    return jsonify({"message": "Message added to the conversation"})
+    return jsonify({"dialogue": dialogue})
 
 
 
