@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import '../css/Chat.css';
 import SplitView from './SplitView';
 import Input from './Input';
-import Card from './Card'
 import Button from './Button';
 
 const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId }) => {
@@ -19,6 +18,7 @@ const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId })
     }, [selectedConversationId, userData]);
 
     useEffect(() => {
+        console.log(userData.conversations.filter(_ => _._id === selectedConversationId)[0].videoId.split("v=")[1])
         if (userData) {
             setVideoId(userData.conversations.filter(_ => _._id === selectedConversationId)[0].videoId.split("v=")[1])
         }
@@ -84,7 +84,7 @@ const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId })
                                         style={{ width: '32px' }}
                                         src={
                                             message.speaker === 'bot'
-                                                ? 'https://cdn.discordapp.com/attachments/715319623637270638/1162640352277180426/image.png?ex=653cac34&is=652a3734&hm=3969200ba9f5342d039e2e51ffe3c940b03892efca3d11e7327007724e9c6866&'
+                                                ? 'https://cdn.discordapp.com/attachments/715319623637270638/1163112688315023379/image_14_1.png?ex=653e641a&is=652bef1a&hm=df8a6aa60d9bacdd97d66c44a4f17545acd9b7e87b044e8f0daf2c2b94d32d36&'
                                                 : 'https://cdn.discordapp.com/attachments/715319623637270638/1162640579222569030/image.png?ex=653cac6a&is=652a376a&hm=02f7b5456ac88219f9fcf8c042f2c485e2a15187b77f21dcd21b355d9868898f&'
                                         }
                                     />

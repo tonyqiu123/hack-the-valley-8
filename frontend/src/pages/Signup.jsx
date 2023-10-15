@@ -8,8 +8,11 @@ import { useNavigate } from "react-router-dom";
 const Signup = () => {
 
     const [currentImg, setCurrentImg] = useState(0);
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
-
+    
     const navigate = useNavigate();
 
     // Function to redirect to the /chat route
@@ -52,15 +55,15 @@ const Signup = () => {
                 <div className='login-body'>
                     <div className='login-body-inputField'>
                         <p>Full name</p>
-                        <Input type='text' placeHolder='' />
+                        <Input search={name} setSearch={setName} type='text' placeHolder='' />
                     </div>
                     <div className='login-body-inputField'>
                         <p>Email address</p>
-                        <Input type='email' placeHolder='' />
+                        <Input search={email} setSearch={setEmail} type='email' placeHolder='' />
                     </div>
                     <div className='login-body-inputField'>
                         <p>Password</p>
-                        <Input type='password' placeHolder='' />
+                        <Input search={password} setSearch={setPassword} type='password' placeHolder='' />
                     </div>
 
                     <Button handleClick={async () => { handleSignup() }} style={{ marginTop: '8px' }} text='Click to signup' variant='primary' size='l' />

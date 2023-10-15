@@ -100,7 +100,7 @@ const Chat = () => {
                             <h1>Buy more credits.</h1>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <p>{userData.creditsUsed} out of {userData.maxCredits} credits used</p>
-                                {userData && <ProgressBar bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />}
+                                {userData &&  <ProgressBar height='22px' labelClassName='progressBarLabel' bgColor='#1b83dd' completed={`${userData.creditsUsed}`} maxCompleted={userData.maxCredits} />}
                             </div>
                             <Button handleClick={async () => setShowAlert(false)} text='Buy more credits' variant='primary' size='l' />
                             <h2>$1 = 1 credit</h2>
@@ -109,11 +109,11 @@ const Chat = () => {
                     <Alert showAlert={showAlert} setShowAlert={setShowAlert}>
                         <Card>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <h4>Insufficient funds!</h4>
+                                <h3>Insufficient credits!</h3>
                                 <p>You used up all your credits. Click the blue button to buy more.</p>
                                 <div style={{ display: 'flex', gap: '8px', margin: '24px 0 0 auto' }}>
                                     <Button handleClick={async () => setShowAlert(false)} text='Cancel' variant='outline' size='l' />
-                                    <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />
+                                    <Button handleClick={async () => { setShowAlert(false); setShowBuyAlert(true)}} text='Click to buy more credits' variant='primary' size='l' />
                                 </div>
                             </div>
                         </Card>

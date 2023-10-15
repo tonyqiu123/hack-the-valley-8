@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
 
     const [currentImg, setCurrentImg] = useState(0);
-
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
     const navigate = useNavigate();
 
@@ -55,11 +56,11 @@ const Login = () => {
                 <div className='login-body'>
                     <div className='login-body-inputField'>
                         <p>Email address</p>
-                        <Input type='email' placeHolder='' />
+                        <Input search={email} setSearch={setEmail} type='email' placeHolder='' />
                     </div>
                     <div className='login-body-inputField'>
                         <p>Password</p>
-                        <Input type='password' placeHolder='' />
+                        <Input search={password} setSearch={setPassword} type='password' placeHolder='' />
                     </div>
 
                     <Button handleClick={async () => { handleLogin() }} style={{ marginTop: '8px' }} text='Click to login' variant='primary' size='l' />
