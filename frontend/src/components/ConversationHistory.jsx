@@ -30,22 +30,23 @@ const ConversationHistory = ({ setPhase, userData, setUserData, setShowBuyAlert 
             },
             body: JSON.stringify({ user_id: userData._id })
         })
-            .then(response => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    throw new Error('Error clearing conversations');
-                }
-            })
-            .then(data => {
-                setUserData(prev => ({ ...prev, conversations: [] }));
-                toast.success('Successfully cleared conversations');
-            })
-            .catch(error => {
-                console.error("Error: ", error);
-            });
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error('Error clearing conversations');
+            }
+        })
+        .then(data => {
+            setPhase('enterUrl')
+            setUserData(prev => ({ ...prev, conversations: [] }));
+            toast.success('Successfully cleared conversations');
+        })
+        .catch(error => {
+            console.error("Error: ", error);
+        });
     }
-
+    
     return (
         <>
             <Toaster richColors />

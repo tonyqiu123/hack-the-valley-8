@@ -24,6 +24,11 @@ const Chat = () => {
     const [showAlert, setShowAlert] = useState(false)
     const [showBuyAlert, setShowBuyAlert] = useState(false)
 
+
+    useEffect(() => {
+        console.log(userData)
+    }, [userData])
+
     const handleFetchUserData = () => {
         fetch('http://localhost:5000/userinfo?user_id=1')
             .then(response => response.json())
@@ -36,41 +41,46 @@ const Chat = () => {
     const handleSubmitYoutubeUrl = async () => {
         try {
             if (userData.creditsUsed === userData.maxCredits) {
-                setShowAlert(true)
-                return
+                setShowAlert(true);
+                return;
             }
             setPhase('fetchingState');
             const response = await fetch('http://localhost:5000/input-new-video', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: userData._id, video_id: urlInput })
+                body: JSON.stringify({ user_id: userData._id, video_id: urlInput }),
             });
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const data = await response.json()
-            setUserData(prevData => ({
-                ...prevData,
-                creditsUsed: prevData.creditsUsed + 1,
+
+            const data = await response.json();
+
+            // Create a new user data object with the updated values
+            const updatedUserData = {
+                ...userData,
+                creditsUsed: userData.creditsUsed + 1,
                 conversations: [
-                    ...prevData.conversations,
+                    ...userData.conversations,
                     {
                         _id: data.conversation_id,
                         videoId: urlInput,
                         messages: [],
-                        summary: data.summary
-                    }
-                ]
-            }));
+                        summary: data.summary,
+                    },
+                ],
+            };
 
-            setPhase('finishedFetching');
+            // Update the userData using the new object
+            setUserData(updatedUserData);
+            setPhase('finishedFetching')
         } catch (err) {
             console.error('Error:', err);
         }
-    }
+    };
 
     useEffect(() => {
         handleFetchUserData()
@@ -80,7 +90,7 @@ const Chat = () => {
         <>
             <Alert showAlert={showBuyAlert} setShowAlert={setShowBuyAlert}>
                 <Card>
-                    <img style={{ cursor:'pointer', width:'16px', position:'absolute', right:'16px', top:'16px' }} onClick={(e) => setShowBuyAlert(false)} src={closeIcon} />
+                    <img style={{ cursor: 'pointer', width: '16px', position: 'absolute', right: '16px', top: '16px' }} onClick={(e) => setShowBuyAlert(false)} src={closeIcon} />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <h4>Buy more credits.</h4>
                         <Button handleClick={async () => setShowAlert(false)} text='Click to buy more credits' variant='primary' size='l' />

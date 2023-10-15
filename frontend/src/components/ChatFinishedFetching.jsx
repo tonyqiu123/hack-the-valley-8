@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import '../css/Chat.css';
-import Button from './Button';
 import SplitView from './SplitView';
 
 const ChatFinishedFetching = ({ children, conversationData }) => {
@@ -27,7 +26,7 @@ const ChatFinishedFetching = ({ children, conversationData }) => {
                 right={
                     <div className='chatFinished-right'>
                         <div ref={messageBodyRef} className='chatFinished-right-messageBody'>
-                            {conversationData.messages?.length > 0 && conversationData.messages.map((message, index) => (
+                            {conversationData.messages && conversationData.messages?.length > 0 && conversationData.messages.map((message, index) => (
                                 <div key={index} className='chatFinished-right-message'>
                                     <img
                                         style={{ width: '32px' }}
