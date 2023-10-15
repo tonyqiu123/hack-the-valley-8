@@ -29,6 +29,7 @@ CORS(app)
 @app.route('/input-new-video', methods=['POST'])
 def new_video():
     ...
+    pattern = r'(?:https://|http://|)(?:www\.)?(?:youtube\.com|youtu\.be)/(?:watch\?v=|v/|embed/|)([A-Za-z0-9_-]+)'
     
     db = client["test"]
     videos = db["videos"]
@@ -36,9 +37,9 @@ def new_video():
     data = request.get_json()
     
     v_id = ''
-    match = re.search(r"(?<=v=)[\w-]+", data['video_id'])
+    match = re.search(pattern, data['video_id'])
     if match:
-        v_id = match.group(0)
+        v_id = match.group(1)
 
     user = users.find_one({"_id": int(data['user_id'])})
     if not user:
