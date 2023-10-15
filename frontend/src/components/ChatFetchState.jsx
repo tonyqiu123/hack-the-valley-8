@@ -9,7 +9,7 @@ const ChatFetchState = ({ phase, setPhase }) => {
 
     return (
         <div className={`chatPageBody fetchingState ${phase === 'fetchingState' ? 'active' : 'inactive'}`}>
-            <img style={{ height: '32px' }} src={loadingSpinner} alt="Loading Spinner" />
+            <img className='loadingPage-spinner' style={{ height: '32px' }} src={loadingSpinner} alt="Loading Spinner" />
             <p>Fetching video...</p>
         </div>
     );

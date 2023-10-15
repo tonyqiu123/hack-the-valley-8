@@ -1,16 +1,64 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../css/Chat.css';
 import SplitView from './SplitView';
+import Input from './Input';
+import Button from './Button';
 
-const ChatFinishedFetching = ({ children, conversationData }) => {
+const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId }) => {
     const messageBodyRef = useRef(null);
+
+    const [messageInput, setMessageInput] = useState('')
 
     useEffect(() => {
         // Scroll to the bottom of the messageBody element on render
         if (messageBodyRef.current) {
             messageBodyRef.current.scrollTop = messageBodyRef.current.scrollHeight;
         }
-    }, [conversationData]);
+    }, [selectedConversationId, userData]);
+
+
+    const handleSendMessage = async () => {
+        const data = {
+            user_id: userData._id,
+            conversation_id: selectedConversationId,
+            message: messageInput
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status === 200) {
+                const responseData = await response.json();
+                const serializedData = responseData.dialogue;
+                // Update the userData state
+                setUserData((prevUserData) => ({
+                    ...prevUserData,
+                    conversations: prevUserData.conversations.map((conversation) => {
+                        if (conversation._id === selectedConversationId) {
+                            // Clone the conversation and push the new message
+                            const updatedConversation = { ...conversation };
+                            updatedConversation.messages.push({ ...serializedData[0] });
+                            updatedConversation.messages.push({ ...serializedData[1] });
+                            return updatedConversation;
+                        } else {
+                            return conversation;
+                        }
+                    })
+                }));
+            } else {
+                throw new Error('Failed to send message');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
 
     return (
         <div className='finishedFetching'>
@@ -26,7 +74,7 @@ const ChatFinishedFetching = ({ children, conversationData }) => {
                 right={
                     <div className='chatFinished-right'>
                         <div ref={messageBodyRef} className='chatFinished-right-messageBody'>
-                            {conversationData.messages && conversationData.messages?.length > 0 && conversationData.messages.map((message, index) => (
+                            {userData && userData.conversations.filter(conversation => conversation._id === selectedConversationId)[0].messages.map((message, index) => (
                                 <div key={index} className='chatFinished-right-message'>
                                     <img
                                         style={{ width: '32px' }}
@@ -42,7 +90,10 @@ const ChatFinishedFetching = ({ children, conversationData }) => {
                                 </div>
                             ))}
                         </div>
-                        <div className='chatFinished-right-inputField'>{children}</div>
+                        <div className='chatFinished-right-inputField'>
+                            <Input style={{ width: '100%' }} placeHolder="Send a message" search={messageInput} setSearch={setMessageInput} />
+                            <Button handleClick={handleSendMessage} size='l' text='Send Message' variant='primary' />
+                        </div>
                     </div>
                 }
             />

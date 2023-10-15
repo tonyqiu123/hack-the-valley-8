@@ -4,7 +4,6 @@ import cohere
 def generate_response(msg):
     # use cohere API to generate response
     co = cohere.Client('CekvF2K8mMYRlHb69H0mjicbkRI62n3i5f4cXZ5R')
-    
     response = co.generate(
         model='command-xlarge-nightly',  # model name
         prompt=msg,  # message to generate a response for

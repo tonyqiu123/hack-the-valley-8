@@ -9,11 +9,10 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { useNavigate } from "react-router-dom"
 import '../css/ProgressBar.css'
 import cashIcon from '../assets/cash.svg'
-import { useEffect } from 'react'
 import { Toaster, toast } from 'sonner'
 
 
-const ConversationHistory = ({ setPhase, userData, setUserData, setShowBuyAlert }) => {
+const ConversationHistory = ({ selectedConversationId, setSelectedConversationId, setPhase, userData, setUserData, setShowBuyAlert }) => {
 
     const navigate = useNavigate()
 
@@ -30,35 +29,36 @@ const ConversationHistory = ({ setPhase, userData, setUserData, setShowBuyAlert 
             },
             body: JSON.stringify({ user_id: userData._id })
         })
-        .then(response => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error('Error clearing conversations');
-            }
-        })
-        .then(data => {
-            setPhase('enterUrl')
-            setUserData(prev => ({ ...prev, conversations: [] }));
-            toast.success('Successfully cleared conversations');
-        })
-        .catch(error => {
-            console.error("Error: ", error);
-        });
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error('Error clearing conversations');
+                }
+            })
+            .then(data => {
+                setSelectedConversationId(null)
+                setPhase('enterUrl')
+                setUserData(prev => ({ ...prev, conversations: [] }));
+                toast.success('Successfully cleared conversations');
+            })
+            .catch(error => {
+                console.error("Error: ", error);
+            });
     }
-    
+
     return (
         <>
             <Toaster richColors />
             <div className="conversationHistory">
                 <div className="conversationContainer">
-                    <Button handleClick={async () => setPhase('enterUrl')} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
+                    <Button handleClick={async () => { setPhase('enterUrl'); setSelectedConversationId(null) }} imageSrc={PlusIcon} variant='primary' text='New Chat' size="l" />
                     {userData ? (
                         userData.conversations
                             .slice() // Create a shallow copy of the array to avoid modifying the original
                             .reverse() // Reverse the copy
                             .map((conversationData, index) => (
-                                <div className="conversationItem" key={index}>
+                                <div className={`conversationItem ${selectedConversationId === conversationData._id ? 'active' : ''}`} onClick={(e) => setSelectedConversationId(conversationData._id)} key={index}>
                                     <p className="conversationText">
                                         {conversationData.summary}
                                     </p>

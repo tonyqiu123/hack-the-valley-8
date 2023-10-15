@@ -15,19 +15,13 @@ import closeIcon from '../assets/close.svg'
 const Chat = () => {
 
     const [urlInput, setUrlInput] = useState('')
-    const [messageInput, setMessageInput] = useState('')
     const [phase, setPhase] = useState('enterUrl');
     const [userData, setUserData] = useState(null)
     const [userId, setUserId] = useState(localStorage.getItem('userId'))
     const [loading, setLoading] = useState(true)
-    const [selectedConversation, setSelectedConversation] = useState(null)
+    const [selectedConversationId, setSelectedConversationId] = useState(null)
     const [showAlert, setShowAlert] = useState(false)
     const [showBuyAlert, setShowBuyAlert] = useState(false)
-
-
-    useEffect(() => {
-        console.log(userData)
-    }, [userData])
 
     const handleFetchUserData = () => {
         fetch('http://localhost:5000/userinfo?user_id=1')
@@ -76,6 +70,7 @@ const Chat = () => {
 
             // Update the userData using the new object
             setUserData(updatedUserData);
+            setSelectedConversationId(data.conversation_id)
             setPhase('finishedFetching')
         } catch (err) {
             console.error('Error:', err);
@@ -85,6 +80,12 @@ const Chat = () => {
     useEffect(() => {
         handleFetchUserData()
     }, [])
+
+    useEffect(() => {
+        if (selectedConversationId !== null) {
+            setPhase('finishedFetching')
+        }
+    }, [selectedConversationId])
 
     return (
         <>
@@ -109,10 +110,10 @@ const Chat = () => {
                     </div>
                 </Card>
             </Alert>
-            {loading ? <Loading className={`loading ${userData ? 'inactive' : ''}`} /> : <Unauthorized />}
+            {loading ? <Loading className={`loadingPage ${userData ? 'inactive' : ''}`} /> : <Unauthorized />}
             {userId && userData ?
                 <div className="chatPage">
-                    <ConversationHistory setShowBuyAlert={setShowBuyAlert} setUserData={setUserData} userData={userData} setPhase={setPhase} />
+                    <ConversationHistory selectedConversationId={selectedConversationId} setSelectedConversationId={setSelectedConversationId} setShowBuyAlert={setShowBuyAlert} setUserData={setUserData} userData={userData} setPhase={setPhase} />
                     <div style={{ paddingLeft: '300px' }}>
 
                         {phase === 'enterUrl' ?
@@ -125,10 +126,7 @@ const Chat = () => {
                         <ChatFetchState phase={phase} setPhase={setPhase} />
 
                         {phase === 'finishedFetching' ?
-                            <ChatFinishedFetching conversationData={userData.conversations[0]}>
-                                <Input style={{ width: '100%' }} placeHolder="Send a message" search={messageInput} setSearch={setMessageInput} />
-                                <Button size='l' text='Send Message' variant='primary' />
-                            </ChatFinishedFetching>
+                            <ChatFinishedFetching userData={userData} setUserData={setUserData} selectedConversationId={selectedConversationId} />
                             : null}
                     </div>
                 </div>
