@@ -32,7 +32,7 @@ const ChatFinishedFetching = ({ setUserData, userData, selectedConversationId })
         };
 
         try {
-            const response = await fetch('http://localhost:5000/send-message', {
+            const response = await fetch('hack-the-valley-8-production.up.railway.app/send-message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
