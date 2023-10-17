@@ -25,7 +25,7 @@ const Chat = () => {
     const [showBuyAlert, setShowBuyAlert] = useState(false)
 
     const handleFetchUserData = () => {
-        fetch('https://hack-the-valley-8-production.up.railway.app:5000/userinfo?user_id=1')
+        fetch('https://hack-the-valley-8-production.up.railway.app/userinfo?user_id=1')
             .then(response => response.json())
             .then(data => setUserData(data.user))
             .catch(err => {

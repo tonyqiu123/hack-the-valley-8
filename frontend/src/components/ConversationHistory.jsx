@@ -22,7 +22,7 @@ const ConversationHistory = ({ selectedConversationId, setSelectedConversationId
     }
 
     const handleClearConversations = () => {
-        fetch('http://localhost:5000/clear', {
+        fetch('https://hack-the-valley-8-production.up.railway.app/clear', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
