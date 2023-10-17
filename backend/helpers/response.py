@@ -1,7 +1,6 @@
 import os
 import cohere
 import re
-import numpy as np
 from helpers.models import get_video_description
 
 def generate_response(msg, link):
