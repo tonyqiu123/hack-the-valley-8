@@ -42,7 +42,7 @@ const Chat = () => {
                 return;
             }
             setPhase('fetchingState');
-            const response = await fetch('http://localhost:5000/input-new-video', {
+            const response = await fetch('https://hack-the-valley-8-production.up.railway.app/input-new-video', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
