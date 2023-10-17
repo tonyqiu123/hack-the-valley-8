@@ -7,6 +7,7 @@ from helpers.models import get_video_description, get_transcript, time_format
 from uuid import uuid4
 from datetime import datetime
 import re
+import os
 
 app = Flask(__name__)
 client = get_mongo_client()
@@ -320,4 +321,4 @@ def pay():
     return jsonify({"message": "successfull payment"}, 200)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True, port=os.getenv("PORT", default=5000))
